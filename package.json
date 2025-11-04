@@ -1,0 +1,24 @@
+{
+  "name": "ht-manager",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local tooling to track Hattrick player evolution.",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "npm --workspace server run dev",
+    "dev:client": "npm --workspace client run dev",
+    "build": "npm run build:server && npm run build:client",
+    "build:server": "npm --workspace server run build",
+    "build:client": "npm --workspace client run build",
+    "lint": "npm run lint:server && npm run lint:client",
+    "lint:server": "npm --workspace server run lint",
+    "lint:client": "npm --workspace client run lint"
+  },
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

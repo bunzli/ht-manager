@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Player {
+  id               Int              @id @default(autoincrement())
+  playerId         Int
+  teamId           Int
+  name             String
+  active           Boolean          @default(true)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  latestSnapshotId Int?             @unique
+  snapshots        PlayerSnapshot[]
+  changes          PlayerChange[]
+
+  latestSnapshot PlayerSnapshot? @relation("LatestSnapshot", fields: [latestSnapshotId], references: [id])
+
+  @@unique([playerId, teamId])
+  @@index([teamId])
+}
+
+model PlayerSnapshot {
+  id        Int      @id @default(autoincrement())
+  player    Player   @relation(fields: [playerId], references: [id])
+  playerId  Int
+  fetchedAt DateTime @default(now())
+  data      Json
+  hash      String
+
+  changes         PlayerChange[]
+  latestForPlayer Player?        @relation("LatestSnapshot")
+
+  @@index([playerId, fetchedAt])
+}
+
+model PlayerChange {
+  id         Int            @id @default(autoincrement())
+  player     Player         @relation(fields: [playerId], references: [id])
+  playerId   Int
+  snapshot   PlayerSnapshot @relation(fields: [snapshotId], references: [id])
+  snapshotId Int
+  fieldName  String
+  oldValue   String?
+  newValue   String?
+  recordedAt DateTime       @default(now())
+
+  @@index([playerId, recordedAt])
+  @@index([snapshotId])
+}
+
+model SyncRun {
+  id           Int        @id @default(autoincrement())
+  requestedAt  DateTime   @default(now())
+  completedAt  DateTime?
+  status       SyncStatus
+  message      String?
+  changesCount Int        @default(0)
+}
+
+enum SyncStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
