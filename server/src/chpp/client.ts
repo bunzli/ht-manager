@@ -47,7 +47,8 @@ export async function fetchChppPlayers(): Promise<ChppPlayer[]> {
   const params = {
     file: "players",
     version: "2.7",
-    teamID: env.CHPP_TEAM_ID
+    teamID: env.CHPP_TEAM_ID,
+    includeMatchInfo: "true"
   };
 
   const token = {
