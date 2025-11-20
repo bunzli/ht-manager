@@ -1,5 +1,7 @@
 type NumericRecord = Record<string, number>;
 
+export type BestPosition = "GK" | "CD" | "WB" | "IM" | "WNG" | "FW";
+
 const POSITION_LABELS: Record<BestPosition, string> = {
   GK: "Goalkeeper",
   CD: "Central Defender",
@@ -28,8 +30,6 @@ const POSITION_COLORS: Record<BestPosition, string> = {
 };
 
 export const POSITION_ORDER: BestPosition[] = ["GK", "CD", "WB", "IM", "WNG", "FW"];
-
-export type BestPosition = keyof typeof POSITION_LABELS;
 
 export type PositionScoreResult = {
   bestPosition: BestPosition | null;

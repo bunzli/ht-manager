@@ -16,11 +16,14 @@ import { fetchPlayers, syncPlayers } from "../../api/players";
 import { SimplePlayersTable } from "./components/SimplePlayersTable";
 import type { BestPosition } from "./utils/positionScores";
 import { POSITION_ORDER, getPositionLabel } from "./utils/positionScores";
+import { FormationSelector } from "./components/FormationSelector";
+import type { Formation } from "./constants/formations";
 
 export function PlayersPage() {
   const queryClient = useQueryClient();
   const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null);
   const [evaluationPosition, setEvaluationPosition] = useState<BestPosition | null>(null);
+  const [selectedFormation, setSelectedFormation] = useState<Formation | null>(null);
 
   const {
     data: players = [],
@@ -67,11 +70,20 @@ export function PlayersPage() {
   return (
     <Stack spacing={3}>
       <Box display="flex" alignItems="center" justifyContent="space-between">
-        <Typography variant="h5">Team Players</Typography>
+        <Typography
+          variant="h5"
+          sx={{
+            color: "#e2e8f0",
+            fontWeight: 700,
+            letterSpacing: "0.5px"
+          }}
+        >
+          Team Players
+        </Typography>
         <Stack direction="row" spacing={2}>
           <Button
             variant="contained"
-            startIcon={syncMutation.isPending ? <CircularProgress size={20} /> : <Refresh />}
+            startIcon={syncMutation.isPending ? <CircularProgress size={20} sx={{ color: "#ffffff" }} /> : <Refresh />}
             onClick={handleSync}
             disabled={syncMutation.isPending}
           >
@@ -87,7 +99,13 @@ export function PlayersPage() {
         gap={1.5}
       >
         <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: "rgba(203, 213, 224, 0.8)",
+              fontWeight: 500
+            }}
+          >
             Evaluate position:
           </Typography>
           <ToggleButtonGroup
@@ -95,6 +113,12 @@ export function PlayersPage() {
             exclusive
             value={evaluationPosition ?? "all"}
             onChange={handleEvaluationChange}
+            sx={{
+              "& .MuiToggleButton-root": {
+                borderColor: "rgba(66, 153, 225, 0.2)",
+                color: "#cbd5e0"
+              }
+            }}
           >
             <ToggleButton value="all">All</ToggleButton>
             {POSITION_ORDER.map((position) => (
@@ -104,18 +128,53 @@ export function PlayersPage() {
             ))}
           </ToggleButtonGroup>
           {evaluationPosition && (
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: "#4299e1",
+                fontWeight: 500
+              }}
+            >
               Showing scores for {getPositionLabel(evaluationPosition)}
             </Typography>
           )}
         </Stack>
-        <Typography variant="body2" color="text.secondary">
+        <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+          <Typography
+            variant="body2"
+            sx={{
+              color: "rgba(203, 213, 224, 0.8)",
+              fontWeight: 500
+            }}
+          >
+            Formation:
+          </Typography>
+          <FormationSelector
+            selectedFormation={selectedFormation}
+            onFormationChange={setSelectedFormation}
+          />
+        </Stack>
+        <Typography
+          variant="body2"
+          sx={{
+            color: "rgba(203, 213, 224, 0.8)",
+            fontWeight: 500
+          }}
+        >
           Players shown: {activePlayersCount}
         </Typography>
       </Box>
 
       {isError ? (
-        <Alert severity="error" onClose={() => refetch()}>
+        <Alert
+          severity="error"
+          onClose={() => refetch()}
+          sx={{
+            bgcolor: "rgba(239, 68, 68, 0.1)",
+            border: "1px solid rgba(239, 68, 68, 0.3)",
+            borderRadius: 2
+          }}
+        >
           Failed to load players. Try again.
         </Alert>
       ) : (
@@ -123,6 +182,7 @@ export function PlayersPage() {
           players={players}
           isLoading={isLoading}
           evaluationPosition={evaluationPosition}
+          selectedFormation={selectedFormation}
         />
       )}
 
@@ -131,6 +191,14 @@ export function PlayersPage() {
         autoHideDuration={6000}
         onClose={() => setSnackbarMessage(null)}
         message={snackbarMessage ?? ""}
+        ContentProps={{
+          sx: {
+            bgcolor: "#0f1428",
+            border: "1px solid rgba(66, 153, 225, 0.2)",
+            borderRadius: 2,
+            color: "#cbd5e0"
+          }
+        }}
       />
     </Stack>
   );

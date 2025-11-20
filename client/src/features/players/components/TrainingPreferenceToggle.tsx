@@ -61,12 +61,17 @@ export function TrainingPreferenceToggle({ playerId }: TrainingPreferenceToggleP
           sx={{
             color: (theme) => {
               if (preference === "full") {
-                return theme.palette.success.main;
+                return "#4299e1";
               }
               if (preference === "half") {
-                return theme.palette.warning.main;
+                return "#63b3ed";
               }
-              return theme.palette.text.disabled;
+              return "rgba(203, 213, 224, 0.4)";
+            },
+            transition: "all 0.2s ease-in-out",
+            "&:hover": {
+              bgcolor: "rgba(66, 153, 225, 0.1)",
+              transform: "scale(1.1)"
             }
           }}
         >
