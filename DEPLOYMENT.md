@@ -65,19 +65,19 @@ The Docker image is automatically built and pushed to GitHub Container Registry 
 4. **Create data directory** (for database persistence):
    - In Dockge, you may need to create a `data` directory in the stack folder
    - Or ensure the volume path `./data` exists relative to where Dockge stores the stack
-5. **Configure environment variables**:
+5. **Configure environment variables** (REQUIRED):
    - In the right panel, find the ".env" section
+   - **You MUST add your CHPP credentials here** - the app will not start without them!
    - Add your environment variables directly in the UI:
      ```
-     NODE_ENV=production
-     PORT=3000
-     DATABASE_URL=file:./prisma/server/prisma/dev.db
-     CHPP_CONSUMER_KEY=your_consumer_key
-     CHPP_CONSUMER_SECRET=your_consumer_secret
-     CHPP_ACCESS_TOKEN=your_access_token
-     CHPP_ACCESS_TOKEN_SECRET=your_access_token_secret
-     CHPP_TEAM_ID=your_team_id
+     CHPP_CONSUMER_KEY=your_actual_consumer_key_here
+     CHPP_CONSUMER_SECRET=your_actual_consumer_secret_here
+     CHPP_ACCESS_TOKEN=your_actual_access_token_here
+     CHPP_ACCESS_TOKEN_SECRET=your_actual_access_token_secret_here
+     CHPP_TEAM_ID=your_actual_team_id_here
      ```
+   - **Important**: Replace the placeholder values with your actual CHPP API credentials
+   - These variables will be automatically passed to the container via the docker-compose.yml environment section
 6. **Start the stack**:
    - Click "Start" or "Deploy" button
    - Docker will pull the image from GHCR (first pull may take a minute)

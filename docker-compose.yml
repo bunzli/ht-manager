@@ -12,6 +12,11 @@ services:
       - NODE_ENV=production
       - PORT=3000
       - DATABASE_URL=file:./prisma/server/prisma/dev.db
+      - CHPP_CONSUMER_KEY=${CHPP_CONSUMER_KEY}
+      - CHPP_CONSUMER_SECRET=${CHPP_CONSUMER_SECRET}
+      - CHPP_ACCESS_TOKEN=${CHPP_ACCESS_TOKEN}
+      - CHPP_ACCESS_TOKEN_SECRET=${CHPP_ACCESS_TOKEN_SECRET}
+      - CHPP_TEAM_ID=${CHPP_TEAM_ID}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
