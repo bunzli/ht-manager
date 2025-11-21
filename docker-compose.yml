@@ -3,15 +3,13 @@ version: '3.8'
 services:
   ht-manager:
     build:
-      context: .
+      context: https://github.com/bunzli/ht-manager.git
       dockerfile: Dockerfile
     container_name: ht-manager
     ports:
       - "3000:3000"
     volumes:
       - ./data:/app/server/prisma/server/prisma
-    env_file:
-      - .env
     environment:
       - NODE_ENV=production
       - PORT=3000

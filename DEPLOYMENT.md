@@ -41,15 +41,20 @@ mkdir -p data
 
 ## Step 2: Deploy with Dockge
 
+**No need to clone the repository!** The docker-compose.yml is configured to build directly from GitHub.
+
 1. **Open Dockge** in your Umbrel dashboard
 2. **Create a new stack**:
    - Click "+ Compose" button
    - Enter stack name: `ht-manager` (lowercase only)
-3. **Upload or paste docker-compose.yml**:
-   - Copy the contents of `docker-compose.yml` from this project
+3. **Paste docker-compose.yml**:
+   - Copy the contents of `docker-compose.yml` from https://github.com/bunzli/ht-manager
    - Paste it into Dockge's YAML editor (right panel)
-   - Or upload the file directly
-4. **Configure environment variables**:
+   - The build context is already configured to pull from GitHub automatically
+4. **Create data directory** (for database persistence):
+   - In Dockge, you may need to create a `data` directory in the stack folder
+   - Or ensure the volume path `./data` exists relative to where Dockge stores the stack
+5. **Configure environment variables**:
    - In the right panel, find the ".env" section
    - Add your environment variables directly in the UI:
      ```
@@ -62,8 +67,7 @@ mkdir -p data
      CHPP_ACCESS_TOKEN_SECRET=your_access_token_secret
      CHPP_TEAM_ID=your_team_id
      ```
-   - **Note**: If using Option B (`.env` file), you can remove the `env_file` section from docker-compose.yml or keep it if the file is accessible
-5. **Start the stack**:
+6. **Start the stack**:
    - Click "Start" or "Deploy" button
    - Wait for the build to complete (first build may take several minutes)
    - Check logs to ensure the container starts successfully
@@ -146,10 +150,12 @@ If Cloudflare Tunnel doesn't automatically configure DNS:
 
 ### Updating the Application
 
-1. **Pull latest changes** from your repository
+Since the build context points to GitHub, updating is simple:
+
+1. **Push your changes** to the GitHub repository (if you made local changes)
 2. **Rebuild the stack** in Dockge:
    - Click "Rebuild" or stop/start the stack
-   - Dockge will rebuild the Docker image with latest code
+   - Docker will automatically pull the latest code from GitHub and rebuild the image
 
 ### Database Backups
 
