@@ -7,7 +7,10 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./data:/app/server/prisma/server/prisma
+      - ht-manager-data:/app/server/prisma/server/prisma
+
+volumes:
+  ht-manager-data:
     environment:
       - NODE_ENV=production
       - PORT=3000

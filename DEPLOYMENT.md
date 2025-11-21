@@ -62,10 +62,7 @@ The Docker image is automatically built and pushed to GitHub Container Registry 
    - Copy the contents of `docker-compose.yml` from https://github.com/bunzli/ht-manager
    - Paste it into Dockge's YAML editor (right panel)
    - The image will be pulled from `ghcr.io/bunzli/ht-manager:latest`
-4. **Create data directory** (for database persistence):
-   - In Dockge, you may need to create a `data` directory in the stack folder
-   - Or ensure the volume path `./data` exists relative to where Dockge stores the stack
-5. **Configure environment variables** (REQUIRED):
+4. **Configure environment variables** (REQUIRED):
    - In the right panel, find the ".env" section
    - **You MUST add your CHPP credentials here** - the app will not start without them!
    - Add your environment variables directly in the UI:
@@ -143,8 +140,10 @@ If Cloudflare Tunnel doesn't automatically configure DNS:
 - Verify the image tag is correct: `ghcr.io/bunzli/ht-manager:latest`
 
 ### Database issues
-- Verify the `data` directory exists and has correct permissions
-- Check that the volume mount path is correct: `./data:/app/server/prisma/server/prisma`
+- The database is stored in a Docker named volume `ht-manager-data` (created automatically)
+- To view the database location: `docker volume inspect ht-manager-data`
+- To backup the database: `docker run --rm -v ht-manager-data:/data -v $(pwd):/backup alpine tar czf /backup/db-backup.tar.gz /data`
+- To restore: `docker run --rm -v ht-manager-data:/data -v $(pwd):/backup alpine tar xzf /backup/db-backup.tar.gz -C /data`
 - Ensure Prisma migrations have run (they should run automatically on first start)
 
 ### Cloudflare Tunnel not working
@@ -178,11 +177,14 @@ Updating is simple with GitHub Actions:
 
 ### Database Backups
 
-The SQLite database is stored in the `data` directory. To backup:
+The SQLite database is stored in a Docker named volume `ht-manager-data`. To backup:
 
 ```bash
-# From your Umbrel server
-cp /path/to/ht-manager/data/dev.db /path/to/backup/dev.db.backup
+# Backup the entire volume
+docker run --rm -v ht-manager-data:/data -v $(pwd):/backup alpine tar czf /backup/ht-manager-db-backup.tar.gz /data
+
+# Or backup just the database file
+docker run --rm -v ht-manager-data:/data -v $(pwd):/backup alpine sh -c "cp /data/dev.db /backup/dev.db.backup"
 ```
 
 ### Viewing Logs
