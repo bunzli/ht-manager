@@ -17,7 +17,13 @@ export function createApp() {
     app.use(express.static(clientDistPath));
     
     // Serve index.html for all non-API routes (SPA routing)
-    app.get("*", (_req: Request, res: Response) => {
+    // Express 5.x doesn't support app.get("*"), so we use app.use() instead
+    app.use((req: Request, res: Response, next: NextFunction) => {
+      // Skip API routes and already handled static files
+      if (req.path.startsWith("/api")) {
+        return next();
+      }
+      // Serve index.html for SPA routing
       res.sendFile(path.join(clientDistPath, "index.html"));
     });
   }
