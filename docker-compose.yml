@@ -8,9 +8,6 @@ services:
       - "3000:3000"
     volumes:
       - ht-manager-data:/app/server/prisma/server/prisma
-
-volumes:
-  ht-manager-data:
     environment:
       - NODE_ENV=production
       - PORT=3000
@@ -27,4 +24,7 @@ volumes:
       timeout: 10s
       retries: 3
       start_period: 40s
+
+volumes:
+  ht-manager-data:
 
