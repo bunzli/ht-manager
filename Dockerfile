@@ -2,12 +2,12 @@
 FROM node:20-alpine AS server-builder
 WORKDIR /app
 
-# Copy package files
+# Copy package files (needed for workspaces)
 COPY package*.json ./
 COPY server/package*.json ./server/
 
-# Install dependencies
-RUN npm ci --workspace server
+# Install all dependencies (workspaces need root install)
+RUN npm ci
 
 # Copy server source
 COPY server/tsconfig.json ./server/
@@ -23,15 +23,16 @@ RUN npm run build
 FROM node:20-alpine AS client-builder
 WORKDIR /app
 
-# Copy package files
+# Copy all package files (needed for workspaces)
 COPY package*.json ./
 COPY client/package*.json ./client/
 
-# Install dependencies
-RUN npm ci --workspace client
+# Install all dependencies (workspaces need root install)
+RUN npm ci
 
-# Copy client source
+# Copy client source and config files
 COPY client/tsconfig.json ./client/
+COPY client/tsconfig.node.json ./client/
 COPY client/vite.config.ts ./client/
 COPY client/index.html ./client/
 COPY client/src ./client/src/
@@ -45,12 +46,12 @@ FROM node:20-alpine AS production
 RUN apk add --no-cache curl
 WORKDIR /app
 
-# Copy package files
+# Copy package files (needed for workspaces)
 COPY package*.json ./
 COPY server/package*.json ./server/
 
-# Install production dependencies only
-RUN npm ci --workspace server --omit=dev
+# Install production dependencies only (workspaces need root install)
+RUN npm ci --omit=dev --workspace server
 
 # Copy built server
 COPY --from=server-builder /app/server/dist ./server/dist
