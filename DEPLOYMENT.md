@@ -39,9 +39,20 @@ CHPP_TEAM_ID=your_team_id
 mkdir -p data
 ```
 
-## Step 2: Deploy with Dockge
+## Step 2: Ensure Docker Image is Built
 
-**No need to clone the repository!** The docker-compose.yml is configured to build directly from GitHub.
+The Docker image is automatically built and pushed to GitHub Container Registry (GHCR) when you push to the `main` branch. 
+
+**First time setup:**
+1. Push your code to GitHub (if you haven't already)
+2. The GitHub Actions workflow will automatically build and push the image to `ghcr.io/bunzli/ht-manager:latest`
+3. Make sure the package is public (if needed):
+   - Go to https://github.com/bunzli/ht-manager/pkgs/container/ht-manager
+   - Click "Package settings" → Change visibility to "Public" if it's private
+
+## Step 3: Deploy with Dockge
+
+**No need to build locally!** The docker-compose.yml uses a pre-built image from GitHub Container Registry.
 
 1. **Open Dockge** in your Umbrel dashboard
 2. **Create a new stack**:
@@ -50,7 +61,7 @@ mkdir -p data
 3. **Paste docker-compose.yml**:
    - Copy the contents of `docker-compose.yml` from https://github.com/bunzli/ht-manager
    - Paste it into Dockge's YAML editor (right panel)
-   - The build context is already configured to pull from GitHub automatically
+   - The image will be pulled from `ghcr.io/bunzli/ht-manager:latest`
 4. **Create data directory** (for database persistence):
    - In Dockge, you may need to create a `data` directory in the stack folder
    - Or ensure the volume path `./data` exists relative to where Dockge stores the stack
@@ -69,17 +80,17 @@ mkdir -p data
      ```
 6. **Start the stack**:
    - Click "Start" or "Deploy" button
-   - Wait for the build to complete (first build may take several minutes)
+   - Docker will pull the image from GHCR (first pull may take a minute)
    - Check logs to ensure the container starts successfully
 
-## Step 3: Verify Local Access
+## Step 4: Verify Local Access
 
 1. **Access the app locally**:
    - Open `http://umbrel.local:3000` in your browser
    - You should see the Hattrick Manager interface
    - The API should be accessible at `http://umbrel.local:3000/api`
 
-## Step 4: Configure Cloudflare Tunnel
+## Step 5: Configure Cloudflare Tunnel
 
 1. **Open Cloudflare Tunnel** in your Umbrel dashboard
 2. **Create a new public hostname**:
@@ -94,7 +105,7 @@ mkdir -p data
    - Check that the tunnel status shows as "Active" or "Healthy"
    - The public hostname should be listed
 
-## Step 5: DNS Configuration (if needed)
+## Step 6: DNS Configuration (if needed)
 
 If Cloudflare Tunnel doesn't automatically configure DNS:
 
@@ -106,7 +117,7 @@ If Cloudflare Tunnel doesn't automatically configure DNS:
    - **Proxy status**: Proxied (orange cloud)
    - **TTL**: Auto
 
-## Step 6: Access Your App
+## Step 7: Access Your App
 
 1. **Open your browser** and navigate to `https://ht.bunzli.cl`
 2. **Verify SSL certificate**:
@@ -120,10 +131,16 @@ If Cloudflare Tunnel doesn't automatically configure DNS:
 ## Troubleshooting
 
 ### Container won't start
-- Check Dockge logs for build errors
+- Check Dockge logs for errors
+- Verify the Docker image exists: `ghcr.io/bunzli/ht-manager:latest`
+- If image is private, you may need to authenticate: `docker login ghcr.io`
 - Verify all environment variables are set correctly
-- Ensure the `.env` file exists and has correct values
 - Check that port 3000 is not already in use
+
+### Image pull fails
+- Ensure the GitHub Container Registry package is public (or authenticate if private)
+- Check GitHub Actions workflow ran successfully
+- Verify the image tag is correct: `ghcr.io/bunzli/ht-manager:latest`
 
 ### Database issues
 - Verify the `data` directory exists and has correct permissions
@@ -150,12 +167,14 @@ If Cloudflare Tunnel doesn't automatically configure DNS:
 
 ### Updating the Application
 
-Since the build context points to GitHub, updating is simple:
+Updating is simple with GitHub Actions:
 
-1. **Push your changes** to the GitHub repository (if you made local changes)
-2. **Rebuild the stack** in Dockge:
+1. **Push your changes** to the GitHub repository
+2. **Wait for GitHub Actions** to build and push the new image (check Actions tab)
+3. **Pull the latest image** in Dockge:
    - Click "Rebuild" or stop/start the stack
-   - Docker will automatically pull the latest code from GitHub and rebuild the image
+   - Docker will pull the latest image from GHCR automatically
+   - Or manually pull: `docker pull ghcr.io/bunzli/ht-manager:latest`
 
 ### Database Backups
 

@@ -2,9 +2,7 @@ version: '3.8'
 
 services:
   ht-manager:
-    build:
-      context: https://github.com/bunzli/ht-manager.git
-      dockerfile: Dockerfile
+    image: ghcr.io/bunzli/ht-manager:latest
     container_name: ht-manager
     ports:
       - "3000:3000"
