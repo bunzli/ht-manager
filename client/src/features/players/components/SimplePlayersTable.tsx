@@ -27,6 +27,8 @@ import { getFieldValue } from "../utils/playerPreparation";
 import { BestPositionCell } from "./table/BestPositionCell";
 import { PlayerNameCell } from "./table/PlayerNameCell";
 import { ActivityIndicatorCell } from "./table/ActivityIndicatorCell";
+import { FormCell } from "./table/FormCell";
+import { StaminaCell } from "./table/StaminaCell";
 import { selectBestPlayersForFormation } from "../constants/formations";
 
 export function SimplePlayersTable({
@@ -73,6 +75,50 @@ export function SimplePlayersTable({
     
     return selectBestPlayersForFormation(preparedPlayers, selectedFormation);
   }, [preparedPlayers, selectedFormation]);
+
+  // Calculate absolute max value across all skills and all players
+  const absoluteMaxSkillValue = useMemo(() => {
+    let max = 0;
+    const skillFieldIds = Array.from(SKILL_FIELDS);
+    
+    preparedPlayers.forEach((player) => {
+      skillFieldIds.forEach((fieldId) => {
+        const value = Number(getFieldValue(player, fieldId) ?? 0);
+        if (Number.isFinite(value) && value > max) {
+          max = value;
+        }
+      });
+    });
+    
+    return max;
+  }, [preparedPlayers]);
+
+  // Get background color for skill value (background blue to super green)
+  const getSkillBackgroundColor = (fieldId: string, value: number): string | null => {
+    if (!SKILL_FIELDS.has(fieldId)) return null;
+    if (absoluteMaxSkillValue === 0 || value === 0) return "#0a0e27"; // background blue for zero
+    if (value === 1) return "#0a0e27"; // background blue for value 1
+    
+    // Calculate ratio from 1 to max (not 0 to max, so 1 maps to background)
+    const ratio = (value - 1) / (absoluteMaxSkillValue - 1);
+    
+    // Interpolate from background blue (#0a0e27) to super green (#3f7137)
+    // Background blue: rgb(10, 14, 39)
+    // Super green: rgb(63, 113, 55)
+    const bgR = 10;
+    const bgG = 14;
+    const bgB = 39;
+    
+    const greenR = 63;
+    const greenG = 113;
+    const greenB = 55;
+    
+    const red = Math.round(bgR + (greenR - bgR) * ratio);
+    const green = Math.round(bgG + (greenG - bgG) * ratio);
+    const blue = Math.round(bgB + (greenB - bgB) * ratio);
+    
+    return `rgb(${red}, ${green}, ${blue})`;
+  };
 
   console.info("[PlayersTable] render", {
     playerCount: preparedPlayers.length,
@@ -158,7 +204,10 @@ export function SimplePlayersTable({
                     textAlign:
                       field.id === "trainingPreference" || field.id === "bestPosition"
                         ? "center"
-                        : "left"
+                        : "left",
+                    ...(SKILL_FIELDS.has(field.id) && {
+                      padding: "10px 2px !important"
+                    })
                   }}
                 >
                   <TableSortLabel
@@ -263,7 +312,30 @@ export function SimplePlayersTable({
                     );
                   }
 
+                  if (field.id === "PlayerForm") {
+                    return (
+                      <FormCell
+                        key={field.id}
+                        player={player}
+                        showWeeklyDiff={showWeeklyDiff}
+                      />
+                    );
+                  }
+
+                  if (field.id === "StaminaSkill") {
+                    return (
+                      <StaminaCell
+                        key={field.id}
+                        player={player}
+                        showWeeklyDiff={showWeeklyDiff}
+                      />
+                    );
+                  }
+
                   const rawValue = getFieldValue(player, field.id);
+                  const numericValue = Number(rawValue ?? 0);
+                  const displayText = formatValue(field.id, rawValue, player, showWeeklyDiff);
+                  const bgColor = getSkillBackgroundColor(field.id, numericValue);
 
                   return (
                     <TableCell
@@ -278,20 +350,49 @@ export function SimplePlayersTable({
                               ? 120
                               : undefined,
                         width: SKILL_FIELDS.has(field.id) ? 54 : undefined,
-                        textAlign: SKILL_FIELDS.has(field.id) ? "center" : "left"
+                        textAlign: SKILL_FIELDS.has(field.id) ? "center" : "left",
+                        ...(SKILL_FIELDS.has(field.id) && {
+                          padding: "8px 2px !important"
+                        })
                       }}
                     >
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontSize: "0.75rem",
-                          color: "#cbd5e0",
-                          fontWeight: SKILL_FIELDS.has(field.id) ? 600 : 400
-                        }}
-                        noWrap={field.id === "Age" || field.id === "TSI"}
-                      >
-                        {formatValue(field.id, rawValue, player, showWeeklyDiff)}
-                      </Typography>
+                      {bgColor ? (
+                        <Box
+                          sx={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            width: "24px",
+                            height: "24px",
+                            borderRadius: "50%",
+                            bgcolor: bgColor,
+                            mx: "auto"
+                          }}
+                        >
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              fontSize: "0.75rem",
+                              color: "#ffffff",
+                              fontWeight: 600
+                            }}
+                          >
+                            {displayText}
+                          </Typography>
+                        </Box>
+                      ) : (
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontSize: "0.75rem",
+                            color: "#cbd5e0",
+                            fontWeight: SKILL_FIELDS.has(field.id) ? 600 : 400
+                          }}
+                          noWrap={field.id === "Age" || field.id === "TSI"}
+                        >
+                          {displayText}
+                        </Typography>
+                      )}
                     </TableCell>
                   );
                 })}
