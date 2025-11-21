@@ -62,10 +62,8 @@ COPY --from=server-builder /app/server/prisma ./server/prisma
 # Copy built client
 COPY --from=client-builder /app/client/dist ./client/dist
 
-# Copy Prisma CLI (needed for migrations)
-COPY --from=server-builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
-COPY --from=server-builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=server-builder /app/node_modules/prisma ./node_modules/prisma
+# Install Prisma CLI globally for migrations
+RUN npm install -g prisma@^6.17.1
 
 # Generate Prisma client for production
 WORKDIR /app/server
