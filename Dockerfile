@@ -50,8 +50,10 @@ WORKDIR /app
 COPY package*.json ./
 COPY server/package*.json ./server/
 
-# Install production dependencies only (workspaces need root install)
-RUN npm ci --omit=dev --workspace server
+# Install production dependencies only
+# For workspaces, we need to install at root level
+# Since we only copied server/package.json, npm will only install server workspace
+RUN npm ci --omit=dev
 
 # Copy built server
 COPY --from=server-builder /app/server/dist ./server/dist
