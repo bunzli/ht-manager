@@ -337,6 +337,17 @@ export function SimplePlayersTable({
                   const displayText = formatValue(field.id, rawValue, player, showWeeklyDiff);
                   const bgColor = getSkillBackgroundColor(field.id, numericValue);
 
+                  // For skill fields, check if there's an arrow indicator to show top bar
+                  let topBarColor: string | null = null;
+                  if (bgColor && SKILL_FIELDS.has(field.id)) {
+                    // Check if displayText ends with an arrow (↑ or ↓)
+                    const arrowMatch = displayText.match(/[↑↓]$/);
+                    if (arrowMatch) {
+                      // Dark green for both up and down
+                      topBarColor = "#3f7137";
+                    }
+                  }
+
                   return (
                     <TableCell
                       key={field.id}
@@ -352,34 +363,53 @@ export function SimplePlayersTable({
                         width: SKILL_FIELDS.has(field.id) ? 54 : undefined,
                         textAlign: SKILL_FIELDS.has(field.id) ? "center" : "left",
                         ...(SKILL_FIELDS.has(field.id) && {
-                          padding: "8px 2px !important"
+                          padding: "8px 2px !important",
+                          position: "relative"
                         })
                       }}
                     >
                       {bgColor ? (
-                        <Box
-                          sx={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            width: "24px",
-                            height: "24px",
-                            borderRadius: "50%",
-                            bgcolor: bgColor,
-                            mx: "auto"
-                          }}
-                        >
-                          <Typography
-                            variant="body2"
+                        <>
+                          {topBarColor && (
+                            <Box
+                              sx={{
+                                position: "absolute",
+                                top: 0,
+                                left: 0,
+                                width: "100%",
+                                height: "4px",
+                                bgcolor: topBarColor,
+                                borderRadius: "0 0 2px 2px",
+                                opacity: 0.9
+                              }}
+                            />
+                          )}
+                          <Box
                             sx={{
-                              fontSize: "0.75rem",
-                              color: "#ffffff",
-                              fontWeight: 600
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              width: "24px",
+                              height: "24px",
+                              borderRadius: "50%",
+                              bgcolor: bgColor,
+                              mx: "auto",
+                              position: "relative",
+                              zIndex: 1
                             }}
                           >
-                            {displayText}
-                          </Typography>
-                        </Box>
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                fontSize: "0.75rem",
+                                color: "#ffffff",
+                                fontWeight: 600
+                              }}
+                            >
+                              {displayText.replace(/[↑↓]\s*$/, "").trim()}
+                            </Typography>
+                          </Box>
+                        </>
                       ) : (
                         <Typography
                           variant="body2"

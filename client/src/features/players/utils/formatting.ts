@@ -5,7 +5,8 @@ import {
   SALARY_MULTIPLIER,
   moneyFormatter,
   WEEKLY_FIELDS,
-  FIELDS_WITHOUT_ANNOTATIONS
+  FIELDS_WITHOUT_ANNOTATIONS,
+  SKILL_FIELDS
 } from "../constants/table";
 import { getPositionDisplayInfo } from "./positionScores";
 
@@ -52,7 +53,7 @@ function formatPlainChangeValue(value: string): string {
 }
 
 export function formatRecentChange(change: PlayerChange): string | null {
-  const { newValue, oldValue } = change;
+  const { newValue, oldValue, fieldName } = change;
   if (newValue === null || oldValue === null) {
     return null;
   }
@@ -64,6 +65,10 @@ export function formatRecentChange(change: PlayerChange): string | null {
     const delta = numericNew - numericOld;
     if (delta === 0) {
       return null;
+    }
+    // For skill fields, use arrows instead of numeric deltas
+    if (SKILL_FIELDS.has(fieldName)) {
+      return delta > 0 ? "↑" : "↓";
     }
     return `(${formatNumericDelta(delta)})`;
   }
@@ -100,7 +105,10 @@ export function appendChangeDecorations(
   if (showWeeklyDiff && !change && player.weeklyDiff && WEEKLY_FIELDS.has(fieldId)) {
     const diff = player.weeklyDiff[fieldId];
     if (diff && diff.delta !== null && diff.delta !== 0) {
-      const annotation = `(${formatNumericDelta(diff.delta)})`;
+      // For skill fields, use arrows instead of numeric deltas
+      const annotation = SKILL_FIELDS.has(fieldId)
+        ? (diff.delta > 0 ? "↑" : "↓")
+        : `(${formatNumericDelta(diff.delta)})`;
       return baseText ? `${baseText} ${annotation}` : annotation;
     }
   }
