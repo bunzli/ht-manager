@@ -98,6 +98,48 @@ export async function syncMatches(): Promise<{ matchesAdded: number; totalMatche
 }
 
 /**
+ * Get the last Friday date (or today if today is Friday)
+ */
+function getLastFriday(): Date {
+  const now = new Date();
+  const dayOfWeek = now.getDay(); // 0 = Sunday, 5 = Friday
+  const daysToSubtract = dayOfWeek === 5 ? 0 : dayOfWeek < 5 ? dayOfWeek + 2 : dayOfWeek - 5;
+  const lastFriday = new Date(now);
+  lastFriday.setDate(now.getDate() - daysToSubtract);
+  lastFriday.setHours(0, 0, 0, 0);
+  return lastFriday;
+}
+
+/**
+ * Get match IDs for this week's official matches
+ * Returns the last 2 matches played after last Friday
+ */
+export async function getThisWeekOfficialMatchesIds(teamId: number): Promise<number[]> {
+  const lastFriday = getLastFriday();
+  
+  // Get finished matches after last Friday, ordered by date descending
+  // Filter for official matches (LEAGUE and CUP) only
+  const matches = await prisma.match.findMany({
+    where: {
+      teamId,
+      matchDate: {
+        gte: lastFriday
+      },
+      status: "FINISHED",
+      matchType: {
+        in: ["LEAGUE", "CUP"]
+      }
+    },
+    orderBy: {
+      matchDate: "desc"
+    },
+    take: 2 // Get last 2 matches
+  });
+
+  return matches.map((match) => match.matchId);
+}
+
+/**
  * List matches for a team
  */
 export async function listMatches(teamId: number, limit?: number): Promise<MatchWithTeam[]> {

@@ -1,28 +1,41 @@
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { Box, Grid, CircularProgress } from "@mui/material";
 import { PlayerCard } from "../../components/PlayerCard";
 import type { Player } from "../../api/players";
-import type { Match } from "../../api/matches";
-import { didNotPlayLastMatch } from "./utils/playerFilters";
+import { playedThisWeek, didNotPlayThisWeek } from "./utils/playerFilters";
+
+export type PlayedThisWeekFilter = "yes" | "no" | "all";
 
 export type PlayersListProps = {
   players: Player[];
   isLoading?: boolean;
-  excludePlayed?: boolean;
-  lastMatch: Match | null;
+  playedThisWeekFilter?: PlayedThisWeekFilter;
+  thisWeekOfficialMatchesIds: number[];
+  onFilteredCountChange?: (count: number) => void;
 };
 
-export function PlayersList({ players, isLoading, excludePlayed = false, lastMatch }: PlayersListProps) {
+export function PlayersList({ players, isLoading, playedThisWeekFilter = "all", thisWeekOfficialMatchesIds, onFilteredCountChange }: PlayersListProps) {
   const activePlayers = useMemo(() => {
     let filtered = players.filter((player) => player.active);
     
-    if (excludePlayed) {
-      // Exclude players who played, keep only those who didn't play
-      filtered = filtered.filter((player) => didNotPlayLastMatch(player, lastMatch));
+    if (playedThisWeekFilter === "yes") {
+      // Show only players who played this week
+      filtered = filtered.filter((player) => playedThisWeek(player, thisWeekOfficialMatchesIds));
+    } else if (playedThisWeekFilter === "no") {
+      // Show only players who did NOT play this week
+      filtered = filtered.filter((player) => didNotPlayThisWeek(player, thisWeekOfficialMatchesIds));
     }
+    // "all" shows all players, no additional filtering
     
     return filtered;
-  }, [players, excludePlayed, lastMatch]);
+  }, [players, playedThisWeekFilter, thisWeekOfficialMatchesIds]);
+
+  // Notify parent of filtered count
+  useEffect(() => {
+    if (onFilteredCountChange) {
+      onFilteredCountChange(activePlayers.length);
+    }
+  }, [activePlayers.length, onFilteredCountChange]);
 
   if (isLoading) {
     return (

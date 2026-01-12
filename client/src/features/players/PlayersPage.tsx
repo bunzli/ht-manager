@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Alert, Stack, Typography, FormControlLabel, Checkbox, Box } from "@mui/material";
+import { Alert, Stack, Typography, Box, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import { fetchPlayers } from "../../api/players";
-import { fetchLastMatch } from "../../api/matches";
-import { PlayersList } from "./PlayersList";
+import { fetchThisWeekOfficialMatchIds } from "../../api/matches";
+import { PlayersList, type PlayedThisWeekFilter } from "./PlayersList";
 
 export function PlayersPage() {
-  const [excludePlayed, setExcludePlayed] = useState(false);
+  const [playedThisWeekFilter, setPlayedThisWeekFilter] = useState<PlayedThisWeekFilter>("all");
+  const [filteredCount, setFilteredCount] = useState<number | null>(null);
   
   const {
     data: players = [],
@@ -19,11 +20,11 @@ export function PlayersPage() {
   });
 
   const {
-    data: lastMatch = null,
-    isLoading: isLoadingLastMatch
+    data: thisWeekOfficialMatchesIds = [],
+    isLoading: isLoadingMatchIds
   } = useQuery({
-    queryKey: ["lastMatch"],
-    queryFn: fetchLastMatch
+    queryKey: ["thisWeekOfficialMatchIds"],
+    queryFn: fetchThisWeekOfficialMatchIds
   });
 
   return (
@@ -37,33 +38,48 @@ export function PlayersPage() {
             letterSpacing: "0.5px"
           }}
         >
-          Team Players
+          Team Players{filteredCount !== null ? ` (${filteredCount})` : ""}
         </Typography>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={excludePlayed}
-              onChange={(e) => setExcludePlayed(e.target.checked)}
-              sx={{
-                color: "#4299e1",
-                "&.Mui-checked": {
-                  color: "#4299e1"
-                }
-              }}
-            />
-          }
-          label={
-            <Typography
-              variant="body2"
-              sx={{
-                color: "#cbd5e0",
-                fontSize: "0.875rem"
-              }}
-            >
-              Exclude players who played last match
-            </Typography>
-          }
-        />
+        <FormControl
+          size="small"
+          sx={{
+            minWidth: 200,
+            "& .MuiOutlinedInput-root": {
+              color: "#cbd5e0",
+              "& fieldset": {
+                borderColor: "rgba(66, 153, 225, 0.3)"
+              },
+              "&:hover fieldset": {
+                borderColor: "rgba(66, 153, 225, 0.5)"
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "#4299e1"
+              }
+            },
+            "& .MuiInputLabel-root": {
+              color: "#9ca3af"
+            },
+            "& .MuiSvgIcon-root": {
+              color: "#9ca3af"
+            }
+          }}
+        >
+          <InputLabel id="played-this-week-filter-label">Played this week?</InputLabel>
+          <Select
+            labelId="played-this-week-filter-label"
+            id="played-this-week-filter"
+            value={playedThisWeekFilter}
+            label="Played this week?"
+            onChange={(e) => setPlayedThisWeekFilter(e.target.value as PlayedThisWeekFilter)}
+            sx={{
+              color: "#cbd5e0"
+            }}
+          >
+            <MenuItem value="all">All</MenuItem>
+            <MenuItem value="yes">Yes</MenuItem>
+            <MenuItem value="no">No</MenuItem>
+          </Select>
+        </FormControl>
       </Box>
 
       {isError ? (
@@ -81,9 +97,10 @@ export function PlayersPage() {
       ) : (
         <PlayersList 
           players={players} 
-          isLoading={isLoading || isLoadingLastMatch} 
-          excludePlayed={excludePlayed}
-          lastMatch={lastMatch}
+          isLoading={isLoading || isLoadingMatchIds} 
+          playedThisWeekFilter={playedThisWeekFilter}
+          thisWeekOfficialMatchesIds={thisWeekOfficialMatchesIds}
+          onFilteredCountChange={setFilteredCount}
         />
       )}
     </Stack>
