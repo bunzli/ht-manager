@@ -36,7 +36,7 @@ export function PlayersList({ players, isLoading, excludePlayed = false, lastMat
     <Grid container spacing={3}>
       {activePlayers.map((player) => (
         <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={player.playerId}>
-          <PlayerCard player={player} />
+          <PlayerCard player={player} clickable={true} />
         </Grid>
       ))}
       {activePlayers.length === 0 && (

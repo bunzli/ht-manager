@@ -1,16 +1,19 @@
 import { Box, Paper, Divider, Typography } from "@mui/material";
 import { Star } from "@mui/icons-material";
-import type { Player } from "../../api/players";
+import { useNavigate } from "react-router-dom";
+import type { PlayerSummary } from "../../api/players";
 import { PlayerHeader } from "./PlayerHeader";
 import { PlayerAvatar } from "./PlayerAvatar";
 import { PlayerStats } from "./PlayerStats";
 import { PlayerSkills } from "./PlayerSkills";
 
 export type PlayerCardProps = {
-  player: Player;
+  player: PlayerSummary;
+  clickable?: boolean;
 };
 
-export function PlayerCard({ player }: PlayerCardProps) {
+export function PlayerCard({ player, clickable = false }: PlayerCardProps) {
+  const navigate = useNavigate();
   const snapshotData = player.latestSnapshot?.data;
   
   // Extract player data from snapshot
@@ -89,16 +92,26 @@ export function PlayerCard({ player }: PlayerCardProps) {
     ? new Date(lastRatingDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })
     : null;
 
+  const handleClick = () => {
+    if (clickable) {
+      navigate(`/players/${player.playerId}`);
+    }
+  };
+
   return (
     <Paper
       elevation={2}
+      onClick={handleClick}
       sx={{
         p: 3,
         bgcolor: "#ffffff",
         borderRadius: 2,
         border: "1px solid #e5e7eb",
+        cursor: clickable ? "pointer" : "default",
+        transition: "all 0.2s ease",
         "&:hover": {
-          boxShadow: 4
+          boxShadow: clickable ? 6 : 4,
+          transform: clickable ? "translateY(-2px)" : "none"
         }
       }}
     >

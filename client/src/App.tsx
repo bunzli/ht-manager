@@ -1,7 +1,9 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AppLayout } from "./layout/AppLayout";
 import { PlayersPage } from "./features/players/PlayersPage";
+import { PlayerDetailPage } from "./features/players/PlayerDetailPage";
 import { MatchesPage } from "./features/matches/MatchesPage";
+import { DatabaseBrowserPage } from "./features/db-browser/DatabaseBrowserPage";
 import { PlayerCardDev } from "./dev/PlayerCardDev";
 import { SkillBarDev } from "./dev/SkillBarDev";
 
@@ -10,7 +12,9 @@ function App() {
     <AppLayout>
       <Routes>
         <Route path="/" element={<PlayersPage />} />
+        <Route path="/players/:playerId" element={<PlayerDetailPage />} />
         <Route path="/matches" element={<MatchesPage />} />
+        <Route path="/db-browser" element={<DatabaseBrowserPage />} />
         {import.meta.env.DEV && (
           <>
             <Route path="/dev/player-card" element={<PlayerCardDev />} />

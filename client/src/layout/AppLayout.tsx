@@ -8,7 +8,8 @@ type AppLayoutProps = PropsWithChildren;
 
 const pages = [
   { label: "Players", path: "/" },
-  { label: "Matches", path: "/matches" }
+  { label: "Matches", path: "/matches" },
+  { label: "Database", path: "/db-browser" }
 ];
 
 export function AppLayout({ children }: AppLayoutProps) {
