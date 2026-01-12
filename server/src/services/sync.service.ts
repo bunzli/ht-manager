@@ -2,6 +2,7 @@ import { createHash } from "crypto";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../db/client";
 import { fetchChppPlayers } from "../chpp/client";
+import { syncMatches } from "./match.service";
 import { env } from "../config/env";
 
 function toRecord(value: Prisma.JsonValue | undefined): Record<string, unknown> {
@@ -185,6 +186,11 @@ export async function runPlayerSync(): Promise<SyncSummary> {
       });
     }
 
+    // Sync matches
+    console.log(`[sync] Syncing matches...`);
+    const matchSyncResult = await syncMatches();
+    console.log(`[sync] Matches sync: ${matchSyncResult.matchesAdded} added, ${matchSyncResult.totalMatches} total`);
+
     await prisma.syncRun.update({
       where: { id: syncRun.id },
       data: {
@@ -194,7 +200,7 @@ export async function runPlayerSync(): Promise<SyncSummary> {
       }
     });
     console.log(
-      `[sync] Run ${syncRun.id} success: ${playersCreated} created, ${playersUpdated} updated, ${totalChanges} changes`
+      `[sync] Run ${syncRun.id} success: ${playersCreated} created, ${playersUpdated} updated, ${totalChanges} changes, ${matchSyncResult.matchesAdded} matches added`
     );
 
     return {

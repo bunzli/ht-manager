@@ -1,15 +1,18 @@
 import { PropsWithChildren } from "react";
-import { AppBar, Box, Button, Container, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Button, Container, Toolbar, Typography, CircularProgress, Snackbar } from "@mui/material";
+import { Refresh } from "@mui/icons-material";
 import { Link as RouterLink, useLocation } from "react-router-dom";
+import { useSync } from "../features/players/hooks/useSync";
 
 type AppLayoutProps = PropsWithChildren;
 
 const pages = [
   { label: "Players", path: "/" },
-  { label: "Configuration", path: "/config" }
+  { label: "Matches", path: "/matches" }
 ];
 
 export function AppLayout({ children }: AppLayoutProps) {
+  const { sync, isPending, snackbarMessage, clearSnackbar } = useSync();
   const location = useLocation();
 
   return (
@@ -54,6 +57,20 @@ export function AppLayout({ children }: AppLayoutProps) {
               {page.label}
             </Button>
           ))}
+          <Button
+            variant="contained"
+            startIcon={isPending ? <CircularProgress size={20} sx={{ color: "#ffffff" }} /> : <Refresh />}
+            onClick={sync}
+            disabled={isPending}
+            sx={{
+              textTransform: "uppercase",
+              letterSpacing: "1px",
+              fontSize: "0.875rem",
+              ml: 2
+            }}
+          >
+            Fetch updates
+          </Button>
         </Toolbar>
       </AppBar>
       <Toolbar />
@@ -80,6 +97,20 @@ export function AppLayout({ children }: AppLayoutProps) {
           ⚽️ Hattrick Manager v0.1 — stay sharp, coach!
         </Typography>
       </Box>
+      <Snackbar
+        open={snackbarMessage !== null}
+        autoHideDuration={6000}
+        onClose={clearSnackbar}
+        message={snackbarMessage ?? ""}
+        ContentProps={{
+          sx: {
+            bgcolor: "#0f1428",
+            border: "1px solid rgba(66, 153, 225, 0.2)",
+            borderRadius: 2,
+            color: "#cbd5e0"
+          }
+        }}
+      />
     </Box>
   );
 }

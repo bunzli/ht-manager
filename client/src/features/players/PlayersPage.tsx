@@ -1,30 +1,13 @@
-import { useMemo, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  Alert,
-  Box,
-  Button,
-  CircularProgress,
-  Snackbar,
-  Stack,
-  Typography,
-  ToggleButton,
-  ToggleButtonGroup
-} from "@mui/material";
-import { Refresh } from "@mui/icons-material";
-import { fetchPlayers, syncPlayers } from "../../api/players";
-import { SimplePlayersTable } from "./components/SimplePlayersTable";
-import type { BestPosition } from "./utils/positionScores";
-import { POSITION_ORDER, getPositionLabel } from "./utils/positionScores";
-import { FormationSelector } from "./components/FormationSelector";
-import type { Formation } from "./constants/formations";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Alert, Stack, Typography, FormControlLabel, Checkbox, Box } from "@mui/material";
+import { fetchPlayers } from "../../api/players";
+import { fetchLastMatch } from "../../api/matches";
+import { PlayersList } from "./PlayersList";
 
 export function PlayersPage() {
-  const queryClient = useQueryClient();
-  const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null);
-  const [evaluationPosition, setEvaluationPosition] = useState<BestPosition | null>(null);
-  const [selectedFormation, setSelectedFormation] = useState<Formation | null>(null);
-
+  const [excludePlayed, setExcludePlayed] = useState(false);
+  
   const {
     data: players = [],
     isLoading,
@@ -35,37 +18,13 @@ export function PlayersPage() {
     queryFn: fetchPlayers
   });
 
-  const syncMutation = useMutation({
-    mutationFn: syncPlayers,
-    onSuccess: (summary) => {
-      void queryClient.invalidateQueries({ queryKey: ["players"] });
-      setSnackbarMessage(
-        `Sync complete: ${summary.playersCreated} new, ${summary.playersUpdated} updated, ${summary.totalChanges} changes`
-      );
-    },
-    onError: (error: unknown) => {
-      setSnackbarMessage(
-        error instanceof Error ? `Sync failed: ${error.message}` : "Sync failed"
-      );
-    }
+  const {
+    data: lastMatch = null,
+    isLoading: isLoadingLastMatch
+  } = useQuery({
+    queryKey: ["lastMatch"],
+    queryFn: fetchLastMatch
   });
-
-  const handleSync = () => {
-    syncMutation.mutate();
-  };
-
-  const handleEvaluationChange = (_event: unknown, value: BestPosition | "all" | null) => {
-    if (value === null || value === "all") {
-      setEvaluationPosition(null);
-    } else {
-      setEvaluationPosition(value);
-    }
-  };
-
-  const activePlayersCount = useMemo(
-    () => players.filter((player) => player.active).length,
-    [players]
-  );
 
   return (
     <Stack spacing={3}>
@@ -80,89 +39,31 @@ export function PlayersPage() {
         >
           Team Players
         </Typography>
-        <Stack direction="row" spacing={2}>
-          <Button
-            variant="contained"
-            startIcon={syncMutation.isPending ? <CircularProgress size={20} sx={{ color: "#ffffff" }} /> : <Refresh />}
-            onClick={handleSync}
-            disabled={syncMutation.isPending}
-          >
-            Fetch updates
-          </Button>
-        </Stack>
-      </Box>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems={{ xs: "flex-start", sm: "center" }}
-        flexDirection={{ xs: "column", sm: "row" }}
-        gap={1.5}
-      >
-        <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-          <Typography
-            variant="body2"
-            sx={{
-              color: "rgba(203, 213, 224, 0.8)",
-              fontWeight: 500
-            }}
-          >
-            Evaluate position:
-          </Typography>
-          <ToggleButtonGroup
-            size="small"
-            exclusive
-            value={evaluationPosition ?? "all"}
-            onChange={handleEvaluationChange}
-            sx={{
-              "& .MuiToggleButton-root": {
-                borderColor: "rgba(66, 153, 225, 0.2)",
-                color: "#cbd5e0"
-              }
-            }}
-          >
-            <ToggleButton value="all">All</ToggleButton>
-            {POSITION_ORDER.map((position) => (
-              <ToggleButton key={position} value={position}>
-                {position}
-              </ToggleButton>
-            ))}
-          </ToggleButtonGroup>
-          {evaluationPosition && (
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={excludePlayed}
+              onChange={(e) => setExcludePlayed(e.target.checked)}
+              sx={{
+                color: "#4299e1",
+                "&.Mui-checked": {
+                  color: "#4299e1"
+                }
+              }}
+            />
+          }
+          label={
             <Typography
               variant="body2"
               sx={{
-                color: "#4299e1",
-                fontWeight: 500
+                color: "#cbd5e0",
+                fontSize: "0.875rem"
               }}
             >
-              Showing scores for {getPositionLabel(evaluationPosition)}
+              Exclude players who played last match
             </Typography>
-          )}
-        </Stack>
-        <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-          <Typography
-            variant="body2"
-            sx={{
-              color: "rgba(203, 213, 224, 0.8)",
-              fontWeight: 500
-            }}
-          >
-            Formation:
-          </Typography>
-          <FormationSelector
-            selectedFormation={selectedFormation}
-            onFormationChange={setSelectedFormation}
-          />
-        </Stack>
-        <Typography
-          variant="body2"
-          sx={{
-            color: "rgba(203, 213, 224, 0.8)",
-            fontWeight: 500
-          }}
-        >
-          Players shown: {activePlayersCount}
-        </Typography>
+          }
+        />
       </Box>
 
       {isError ? (
@@ -178,28 +79,13 @@ export function PlayersPage() {
           Failed to load players. Try again.
         </Alert>
       ) : (
-        <SimplePlayersTable
-          players={players}
-          isLoading={isLoading}
-          evaluationPosition={evaluationPosition}
-          selectedFormation={selectedFormation}
+        <PlayersList 
+          players={players} 
+          isLoading={isLoading || isLoadingLastMatch} 
+          excludePlayed={excludePlayed}
+          lastMatch={lastMatch}
         />
       )}
-
-      <Snackbar
-        open={snackbarMessage !== null}
-        autoHideDuration={6000}
-        onClose={() => setSnackbarMessage(null)}
-        message={snackbarMessage ?? ""}
-        ContentProps={{
-          sx: {
-            bgcolor: "#0f1428",
-            border: "1px solid rgba(66, 153, 225, 0.2)",
-            borderRadius: 2,
-            color: "#cbd5e0"
-          }
-        }}
-      />
     </Stack>
   );
 }

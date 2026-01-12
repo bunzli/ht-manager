@@ -68,3 +68,51 @@ enum SyncStatus {
   SUCCESS
   FAILED
 }
+
+enum MatchStatus {
+  FINISHED
+  ONGOING
+  UPCOMING
+}
+
+enum MatchType {
+  LEAGUE
+  CUP
+  FRIENDLY
+  QUALIFICATION
+  SINGLE
+  PREPARATION
+  HATTRICK_MASTERS
+  WORLD_CUP
+  U20_WORLD_CUP
+  LADDER
+  TOURNAMENT
+}
+
+model Match {
+  id                Int        @id @default(autoincrement())
+  matchId           Int        @unique
+  teamId            Int
+  matchDate         DateTime
+  homeTeamId        Int
+  homeTeamName      String
+  homeTeamShortName String?
+  awayTeamId        Int
+  awayTeamName      String
+  awayTeamShortName String?
+  homeGoals         Int        @default(0)
+  awayGoals         Int        @default(0)
+  status            MatchStatus
+  matchType         MatchType
+  matchContextId    Int        @default(0)
+  cupLevel          Int?
+  cupLevelIndex     Int?
+  sourceSystem       String?
+  ordersGiven        Boolean?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([teamId, matchDate])
+  @@index([matchId])
+  @@index([matchDate])
+}

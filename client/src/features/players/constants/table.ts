@@ -1,3 +1,7 @@
+// Minimal constants file for backward compatibility
+// These may be used by utility functions that are not currently imported
+// but kept for potential future use
+
 export const SALARY_MULTIPLIER = 20;
 
 export const moneyFormatter = new Intl.NumberFormat(undefined, {
@@ -47,4 +51,3 @@ export const PLAY_ACTIVITY_FIELDS = new Set([
   "AssistsCurrentTeam",
   "Cards"
 ]);
-
