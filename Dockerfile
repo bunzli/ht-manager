@@ -43,7 +43,7 @@ RUN npm run build
 
 # Stage 3: Production runtime
 FROM node:20-alpine AS production
-RUN apk add --no-cache curl
+RUN apk add --no-cache curl sqlite
 WORKDIR /app
 
 # Copy package files (needed for workspaces)
