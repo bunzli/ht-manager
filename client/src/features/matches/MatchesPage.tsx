@@ -104,7 +104,7 @@ export function MatchesPage() {
       ) : (
         <Grid container spacing={2}>
           {matches.map((match) => (
-            <Grid item xs={12} sm={6} md={4} key={match.id}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={match.id}>
               <Card
                 sx={{
                   bgcolor: "#0a0e27",
@@ -216,7 +216,7 @@ export function MatchesPage() {
             </Grid>
           ))}
           {matches.length === 0 && !isLoading && (
-            <Grid item xs={12}>
+            <Grid size={12}>
               <Box
                 sx={{
                   textAlign: "center",
