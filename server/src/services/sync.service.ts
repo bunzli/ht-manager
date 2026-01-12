@@ -32,11 +32,19 @@ type ChangeDiff = {
   newValue: string | null;
 };
 
+// Fields to exclude from change tracking
+const EXCLUDED_FIELDS = new Set(["LastMatch", "AgeDays"]);
+
 function diffRecords(oldData: Record<string, unknown>, newData: Record<string, unknown>): ChangeDiff[] {
   const keys = new Set([...Object.keys(oldData), ...Object.keys(newData)]);
   const changes: ChangeDiff[] = [];
 
   for (const key of keys) {
+    // Skip excluded fields
+    if (EXCLUDED_FIELDS.has(key)) {
+      continue;
+    }
+
     const oldValue = oldData[key];
     const newValue = newData[key];
 
