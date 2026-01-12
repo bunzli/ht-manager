@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Paper, Typography, TextField, Button, Stack } from "@mui/material";
+import { Box, Paper, Typography, TextField, Button, Stack, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import { DevLayout } from "./DevLayout";
 import { PlayerCard } from "../components/PlayerCard";
 import type { Player } from "../api/players";
@@ -46,6 +46,17 @@ function createMockPlayer(overrides?: Partial<Player>): Player {
 
   return { ...basePlayer, ...overrides };
 }
+
+const SPECIALTIES = [
+  "-",
+  "Technical",
+  "Quick",
+  "Powerful",
+  "Head",
+  "Unpredictable",
+  "Resilient",
+  "Support"
+];
 
 export function PlayerCardDev() {
   const [mockPlayer, setMockPlayer] = useState<Player>(createMockPlayer());
@@ -109,6 +120,20 @@ export function PlayerCardDev() {
               value={(mockPlayer.latestSnapshot?.data as Record<string, unknown>)?.KeeperSkill ?? ""}
               onChange={(e) => handleUpdateField("KeeperSkill", e.target.value)}
             />
+            <FormControl size="small" sx={{ minWidth: 150 }}>
+              <InputLabel>Specialty</InputLabel>
+              <Select
+                value={(mockPlayer.latestSnapshot?.data as Record<string, unknown>)?.Specialty ?? "-"}
+                label="Specialty"
+                onChange={(e) => handleUpdateField("Specialty", e.target.value)}
+              >
+                {SPECIALTIES.map((specialty) => (
+                  <MenuItem key={specialty} value={specialty}>
+                    {specialty === "-" ? "None" : specialty}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Stack>
         </Box>
       </Paper>

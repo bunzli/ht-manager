@@ -6,9 +6,9 @@ export const SKILL_LEVELS: Record<number, string> = {
   1: "disastrous",
   2: "wretched",
   3: "poor",
-  4: "inadequate",
-  5: "passable",
-  6: "weak",
+  4: "weak",
+  5: "inadequate",
+  6: "passable",
   7: "solid",
   8: "excellent",
   9: "formidable",
@@ -46,10 +46,10 @@ export function getSkillLevelColor(level: number | null | undefined): string {
     return "#ef4444"; // red for disastrous/wretched
   }
   if (level <= 4) {
-    return "#f59e0b"; // orange for poor/inadequate
+    return "#f59e0b"; // orange for poor/weak
   }
   if (level <= 6) {
-    return "#eab308"; // yellow for passable/weak
+    return "#eab308"; // yellow for inadequate/passable
   }
   if (level <= 8) {
     return "#84cc16"; // light green for solid/excellent
