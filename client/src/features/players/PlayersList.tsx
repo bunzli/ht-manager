@@ -2,40 +2,38 @@ import { useMemo, useEffect } from "react";
 import { Box, Grid, CircularProgress } from "@mui/material";
 import { PlayerCard } from "../../components/PlayerCard";
 import type { Player } from "../../api/players";
-import { playedThisWeek, didNotPlayThisWeek } from "./utils/playerFilters";
-
-export type PlayedThisWeekFilter = "yes" | "no" | "all";
+import { applyFilters, type PlayerFilters } from "./utils/playerFilters";
+import { sortPlayers, type PlayerSort } from "./utils/playerSorting";
 
 export type PlayersListProps = {
   players: Player[];
   isLoading?: boolean;
-  playedThisWeekFilter?: PlayedThisWeekFilter;
+  filters: PlayerFilters;
+  sort: PlayerSort;
   thisWeekOfficialMatchesIds: number[];
   onFilteredCountChange?: (count: number) => void;
 };
 
-export function PlayersList({ players, isLoading, playedThisWeekFilter = "all", thisWeekOfficialMatchesIds, onFilteredCountChange }: PlayersListProps) {
-  const activePlayers = useMemo(() => {
-    let filtered = players.filter((player) => player.active);
-    
-    if (playedThisWeekFilter === "yes") {
-      // Show only players who played this week
-      filtered = filtered.filter((player) => playedThisWeek(player, thisWeekOfficialMatchesIds));
-    } else if (playedThisWeekFilter === "no") {
-      // Show only players who did NOT play this week
-      filtered = filtered.filter((player) => didNotPlayThisWeek(player, thisWeekOfficialMatchesIds));
-    }
-    // "all" shows all players, no additional filtering
-    
-    return filtered;
-  }, [players, playedThisWeekFilter, thisWeekOfficialMatchesIds]);
+export function PlayersList({ 
+  players, 
+  isLoading, 
+  filters, 
+  sort,
+  thisWeekOfficialMatchesIds, 
+  onFilteredCountChange 
+}: PlayersListProps) {
+  const filteredAndSortedPlayers = useMemo(() => {
+    const filtered = applyFilters(players, filters, thisWeekOfficialMatchesIds);
+    const sorted = sortPlayers(filtered, sort);
+    return sorted;
+  }, [players, filters, sort, thisWeekOfficialMatchesIds]);
 
   // Notify parent of filtered count
   useEffect(() => {
     if (onFilteredCountChange) {
-      onFilteredCountChange(activePlayers.length);
+      onFilteredCountChange(filteredAndSortedPlayers.length);
     }
-  }, [activePlayers.length, onFilteredCountChange]);
+  }, [filteredAndSortedPlayers.length, onFilteredCountChange]);
 
   if (isLoading) {
     return (
@@ -47,12 +45,12 @@ export function PlayersList({ players, isLoading, playedThisWeekFilter = "all", 
 
   return (
     <Grid container spacing={3}>
-      {activePlayers.map((player) => (
+      {filteredAndSortedPlayers.map((player) => (
         <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={player.playerId}>
           <PlayerCard player={player} clickable={true} />
         </Grid>
       ))}
-      {activePlayers.length === 0 && (
+      {filteredAndSortedPlayers.length === 0 && (
         <Grid size={12}>
           <Box
             sx={{
@@ -61,7 +59,7 @@ export function PlayersList({ players, isLoading, playedThisWeekFilter = "all", 
               color: "#9ca3af"
             }}
           >
-            No active players found
+            No players found matching the filters
           </Box>
         </Grid>
       )}

@@ -1,4 +1,4 @@
-import { Box, Paper, Divider, Typography } from "@mui/material";
+import { Box, Paper, Divider, Typography, Chip } from "@mui/material";
 import { Star } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import type { PlayerSummary } from "../../api/players";
@@ -6,6 +6,7 @@ import { PlayerHeader } from "./PlayerHeader";
 import { PlayerAvatar } from "./PlayerAvatar";
 import { PlayerStats } from "./PlayerStats";
 import { PlayerSkills } from "./PlayerSkills";
+import { computePositionScores, POSITION_ORDER, getPositionAbbreviation, getPositionColor } from "../../features/players/utils/positionScores";
 
 export type PlayerCardProps = {
   player: PlayerSummary;
@@ -92,6 +93,11 @@ export function PlayerCard({ player, clickable = false }: PlayerCardProps) {
     ? new Date(lastRatingDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })
     : null;
 
+  // Compute position scores
+  const positionScoresResult = snapshotData && typeof snapshotData === "object" && !Array.isArray(snapshotData)
+    ? computePositionScores(snapshotData)
+    : null;
+
   const handleClick = () => {
     if (clickable) {
       navigate(`/players/${player.playerId}`);
@@ -147,6 +153,46 @@ export function PlayerCard({ player, clickable = false }: PlayerCardProps) {
         scoring={scoring}
         setPieces={setPieces}
       />
+
+      {positionScoresResult && (
+        <>
+          <Divider sx={{ my: 2 }} />
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="body2" sx={{ color: "#374151", fontSize: "0.875rem", mb: 1, fontWeight: 500 }}>
+              Position Ratings
+            </Typography>
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+              {POSITION_ORDER.map((position) => {
+                const score = positionScoresResult.scores[position];
+                if (score === undefined) return null;
+                
+                const isBest = positionScoresResult.bestPosition === position;
+                const positionColor = getPositionColor(position);
+                const positionAbbrev = getPositionAbbreviation(position);
+                
+                return (
+                  <Chip
+                    key={position}
+                    label={`${positionAbbrev}: ${score.toFixed(2)}`}
+                    size="small"
+                    sx={{
+                      bgcolor: isBest ? positionColor : "#f3f4f6",
+                      color: isBest ? "#ffffff" : "#374151",
+                      fontWeight: isBest ? 600 : 400,
+                      fontSize: "0.75rem",
+                      height: "24px",
+                      border: isBest ? `2px solid ${positionColor}` : "1px solid #e5e7eb",
+                      "& .MuiChip-label": {
+                        px: 1
+                      }
+                    }}
+                  />
+                );
+              })}
+            </Box>
+          </Box>
+        </>
+      )}
 
       <Divider sx={{ my: 2 }} />
 
