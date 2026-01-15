@@ -203,7 +203,9 @@ export async function fetchChppAvatars(): Promise<ChppAvatar[]> {
     const playerId = Number(player["PlayerID"]);
     const avatar = player["Avatar"] as Record<string, unknown> | undefined;
     const backgroundImage = normalizeAvatarUrl((avatar?.["BackgroundImage"] as string) ?? "");
-    const layersRaw = ensureArray<Record<string, unknown>>(avatar?.["Layer"]);
+    const layersRaw = ensureArray<Record<string, unknown>>(
+      avatar?.["Layer"] as Record<string, unknown> | Record<string, unknown>[] | undefined
+    );
 
     const layers: AvatarLayer[] = layersRaw.map((layer) => {
       // Handle both attribute access patterns (x vs @x) and ensure we get numbers
