@@ -10,3 +10,5 @@ export { PlayerAvatar } from "./PlayerAvatar";
 export type { PlayerAvatarProps } from "./PlayerAvatar";
 export { PlayerStats } from "./PlayerStats";
 export type { PlayerStatsProps } from "./PlayerStats";
+export { PositionField } from "./PositionField";
+export type { PositionFieldProps } from "./PositionField";

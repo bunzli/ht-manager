@@ -1,4 +1,3 @@
-import { Heart } from "lucide-react";
 import { getSkillLevelText } from "./utils";
 
 export type PlayerHeaderProps = {
@@ -27,7 +26,6 @@ export function PlayerHeader({
           <h3 className="font-semibold text-lg text-emerald-600 underline">
             {name}
           </h3>
-          <Heart className="size-4 text-red-500 fill-red-500" />
         </div>
         {countryId && (
           <div

@@ -58,6 +58,29 @@ export function getSkillLevelColor(level: number | null | undefined): string {
 }
 
 /**
+ * Get form/stamina color based on value
+ * 7-8: super (green)
+ * 6: ok (yellow)
+ * 4-5: bad (orange)
+ * ≤3: super bad (red)
+ */
+export function getFormStaminaColor(value: number | null | undefined): string {
+  if (value === null || value === undefined) {
+    return "#9ca3af"; // gray
+  }
+  if (value >= 7) {
+    return "#22c55e"; // green - super
+  }
+  if (value === 6) {
+    return "#eab308"; // yellow - ok
+  }
+  if (value >= 4) {
+    return "#f97316"; // orange - bad
+  }
+  return "#ef4444"; // red - super bad (≤3)
+}
+
+/**
  * Format age from years and days
  */
 export function formatAge(years: number | null | undefined, days: number | null | undefined): string {

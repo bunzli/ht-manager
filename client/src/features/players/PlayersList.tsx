@@ -44,9 +44,9 @@ export function PlayersList({
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-10 gap-y-8">
       {filteredAndSortedPlayers.map((player) => (
-        <div key={player.playerId}>
+        <div key={player.playerId} className="flex justify-center">
           <PlayerCard player={player} clickable={true} />
         </div>
       ))}
