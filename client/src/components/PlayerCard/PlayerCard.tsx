@@ -1,7 +1,7 @@
 import { Box, Paper, Divider, Typography, Chip } from "@mui/material";
 import { Star } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import type { PlayerSummary } from "../../api/players";
+import type { PlayerSummary, Avatar } from "../../api/players";
 import { PlayerHeader } from "./PlayerHeader";
 import { PlayerAvatar } from "./PlayerAvatar";
 import { PlayerStats } from "./PlayerStats";
@@ -51,8 +51,8 @@ export function PlayerCard({ player, clickable = false }: PlayerCardProps) {
   const countryId = snapshotData && typeof snapshotData === "object" && !Array.isArray(snapshotData)
     ? (snapshotData.CountryID as number | undefined)
     : undefined;
-  const playerNumber = snapshotData && typeof snapshotData === "object" && !Array.isArray(snapshotData)
-    ? (snapshotData.PlayerNumber as number | undefined)
+  const avatar = snapshotData && typeof snapshotData === "object" && !Array.isArray(snapshotData)
+    ? (snapshotData.Avatar as Avatar | undefined)
     : undefined;
   const keeper = snapshotData && typeof snapshotData === "object" && !Array.isArray(snapshotData)
     ? (snapshotData.KeeperSkill as number | undefined)
@@ -130,7 +130,7 @@ export function PlayerCard({ player, clickable = false }: PlayerCardProps) {
       />
       
       <Box sx={{ display: "flex", gap: 3, mb: 2 }}>
-        <PlayerAvatar playerNumber={playerNumber} />
+        <PlayerAvatar avatar={avatar} />
         <Box sx={{ flex: 1 }}>
           <PlayerStats
             age={age}

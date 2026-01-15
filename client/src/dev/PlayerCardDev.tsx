@@ -4,6 +4,24 @@ import { DevLayout } from "./DevLayout";
 import { PlayerCard } from "../components/PlayerCard";
 import type { Player } from "../api/players";
 
+// Mock avatar data based on real Hattrick API response (uses relative paths)
+const MOCK_AVATAR = {
+  backgroundImage: "/Img/Avatar/backgrounds/card1.png",
+  layers: [
+    { image: "/Img/Avatar/backgrounds/bg_blue_int.png", x: 9, y: 10 },
+    { image: "/Img/Avatar/bodies/bd3_s1.png", x: 9, y: 10 },
+    { image: "/Img/Avatar/faces/f1a.png", x: 9, y: 10 },
+    { image: "/Img/Avatar/beards/f1b2e.png", x: 9, y: 10 },
+    { image: "/Img/Avatar/eyes/e12a.png", x: 23, y: 24 },
+    { image: "/Img/Avatar/mouths/f1bem31c.png", x: 9, y: 10 },
+    { image: "/Img/Avatar/noses/f1ben12.png", x: 9, y: 10 },
+    { image: "/Img/Avatar/hair/f1h12e.png", x: 9, y: 10 },
+    { image: "/Img/Avatar/misc/yellow.png", x: 9, y: 135 },
+    { image: "/Img/Avatar/misc/yellow.png", x: 19, y: 135 },
+    { image: "/Img/Avatar/numbers/20.png", x: 83, y: 130 }
+  ]
+};
+
 // Mock player data for development
 function createMockPlayer(overrides?: Partial<Player>): Player {
   const basePlayer: Player = {
@@ -39,7 +57,8 @@ function createMockPlayer(overrides?: Partial<Player>): Player {
           Rating: 2.5,
           Date: "2025-12-31",
           Position: "Wing Back"
-        }
+        },
+        Avatar: MOCK_AVATAR
       }
     }
   };

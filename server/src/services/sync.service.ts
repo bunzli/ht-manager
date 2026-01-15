@@ -1,7 +1,7 @@
 import { createHash } from "crypto";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../db/client";
-import { fetchChppPlayers } from "../chpp/client";
+import { fetchChppPlayers, fetchChppAvatars, type ChppAvatar } from "../chpp/client";
 import { syncMatches } from "./match.service";
 import { env } from "../config/env";
 
@@ -33,7 +33,7 @@ type ChangeDiff = {
 };
 
 // Fields to exclude from change tracking
-const EXCLUDED_FIELDS = new Set(["LastMatch", "AgeDays"]);
+const EXCLUDED_FIELDS = new Set(["LastMatch", "AgeDays", "Avatar"]);
 
 function diffRecords(oldData: Record<string, unknown>, newData: Record<string, unknown>): ChangeDiff[] {
   const keys = new Set([...Object.keys(oldData), ...Object.keys(newData)]);
@@ -83,6 +83,16 @@ export async function runPlayerSync(): Promise<SyncSummary> {
     const chppPlayers = await fetchChppPlayers();
     console.log(`[sync] Retrieved ${chppPlayers.length} players from CHPP`);
 
+    // Fetch avatars and create a lookup map
+    let avatarMap = new Map<number, ChppAvatar>();
+    try {
+      const chppAvatars = await fetchChppAvatars();
+      console.log(`[sync] Retrieved ${chppAvatars.length} avatars from CHPP`);
+      avatarMap = new Map(chppAvatars.map((a) => [a.playerId, a]));
+    } catch (avatarError) {
+      console.warn("[sync] Failed to fetch avatars, continuing without them", avatarError);
+    }
+
     let playersCreated = 0;
     let playersUpdated = 0;
     let totalChanges = 0;
@@ -123,7 +133,18 @@ export async function runPlayerSync(): Promise<SyncSummary> {
 
         const previousSnapshot = existing?.latestSnapshot ?? null;
         const previousData = toRecord(previousSnapshot?.data);
-        const newData = chppPlayer.raw;
+
+        // Merge avatar data into player raw data
+        const avatar = avatarMap.get(chppPlayer.playerId);
+        const newData: Record<string, unknown> = {
+          ...chppPlayer.raw,
+          ...(avatar && {
+            Avatar: {
+              backgroundImage: avatar.backgroundImage,
+              layers: avatar.layers
+            }
+          })
+        };
         const newHash = hashJson(newData);
 
         if (previousSnapshot && previousSnapshot.hash === newHash) {

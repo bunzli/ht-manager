@@ -1,5 +1,16 @@
 import { api } from "./http";
 
+export type AvatarLayer = {
+  image: string;
+  x: number;
+  y: number;
+};
+
+export type Avatar = {
+  backgroundImage: string;
+  layers: AvatarLayer[];
+};
+
 export type PlayerChange = {
   changeId: number;
   fieldName: string;

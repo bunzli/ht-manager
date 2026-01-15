@@ -25,6 +25,9 @@ export function DevLayout({ children }: DevLayoutProps) {
             <Link component={RouterLink} to="/dev/skill-bar" sx={{ color: "#2563eb" }}>
               Skill Bar
             </Link>
+            <Link component={RouterLink} to="/dev/player-avatar" sx={{ color: "#2563eb" }}>
+              Player Avatar
+            </Link>
             <Link component={RouterLink} to="/" sx={{ color: "#6b7280" }}>
               ← Back to App
             </Link>
