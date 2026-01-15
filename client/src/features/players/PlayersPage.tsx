@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, Stack, Typography } from "@mui/material";
 import { fetchPlayers } from "../../api/players";
-import { fetchThisWeekOfficialMatchIds } from "../../api/matches";
+import { fetchMatches } from "../../api/matches";
 import { PlayersList } from "./PlayersList";
 import { PlayerFiltersAndSort } from "./components/PlayerFiltersAndSort";
 import type { PlayerFilters } from "./utils/playerFilters";
+import { getThisWeekOfficialMatchIds } from "./utils/playerFilters";
 import type { PlayerSort } from "./utils/playerSorting";
 
 const defaultFilters: PlayerFilters = {};
@@ -31,12 +32,16 @@ export function PlayersPage() {
   });
 
   const {
-    data: thisWeekOfficialMatchesIds = [],
-    isLoading: isLoadingMatchIds
+    data: matches = [],
+    isLoading: isLoadingMatches
   } = useQuery({
-    queryKey: ["thisWeekOfficialMatchIds"],
-    queryFn: fetchThisWeekOfficialMatchIds
+    queryKey: ["matches"],
+    queryFn: () => fetchMatches(50)
   });
+
+  const thisWeekOfficialMatchesIds = useMemo(() => {
+    return getThisWeekOfficialMatchIds(matches);
+  }, [matches]);
 
 
   return (
@@ -74,7 +79,7 @@ export function PlayersPage() {
       ) : (
         <PlayersList 
           players={players} 
-          isLoading={isLoading || isLoadingMatchIds} 
+          isLoading={isLoading || isLoadingMatches} 
           filters={filters}
           sort={sort}
           thisWeekOfficialMatchesIds={thisWeekOfficialMatchesIds}

@@ -39,8 +39,3 @@ export async function fetchLastMatch(): Promise<Match | null> {
   const matches = await fetchMatches(1);
   return matches.length > 0 ? matches[0] : null;
 }
-
-export async function fetchThisWeekOfficialMatchIds(): Promise<number[]> {
-  const response = await api.get<{ matchIds: number[] }>("/matches/this-week-ids");
-  return response.data.matchIds;
-}

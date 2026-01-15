@@ -1,6 +1,7 @@
 import type { Player } from "../../../api/players";
 import type { BestPosition } from "./positionScores";
 import { computePositionScores } from "./positionScores";
+import type { Match } from "../../../api/matches";
 
 /**
  * Get the match ID from a player's LastMatch data
@@ -56,6 +57,36 @@ function getStringValue(snapshotData: Record<string, unknown>, key: string): str
     return value;
   }
   return null;
+}
+
+/**
+ * Get the last Friday date (or today if today is Friday)
+ * Uses UTC to avoid timezone issues when comparing dates
+ */
+function getLastFriday(): Date {
+  const now = new Date();
+  const dayOfWeek = now.getUTCDay(); // 0 = Sunday, 5 = Friday
+  const daysToSubtract = dayOfWeek === 5 ? 0 : dayOfWeek < 5 ? dayOfWeek + 2 : dayOfWeek - 5;
+  const lastFriday = new Date(now);
+  lastFriday.setUTCDate(lastFriday.getUTCDate() - daysToSubtract);
+  lastFriday.setUTCHours(0, 0, 0, 0);
+  return lastFriday;
+}
+
+/**
+ * Get match IDs for this week's official matches from a list of matches
+ * Returns the last 2 matches played after last Friday
+ */
+export function getThisWeekOfficialMatchIds(matches: Match[]): number[] {
+  const lastFriday = getLastFriday();
+  return matches
+    .filter(m => 
+      m.status === "FINISHED" &&
+      ["LEAGUE", "CUP", "TOURNAMENT"].includes(m.matchType) &&
+      new Date(m.matchDate) >= lastFriday
+    )
+    .slice(0, 2)
+    .map(m => m.matchId);
 }
 
 /**

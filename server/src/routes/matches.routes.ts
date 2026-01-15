@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { listMatches, findMatch, getThisWeekOfficialMatchesIds } from "../services/match.service";
+import { listMatches, findMatch } from "../services/match.service";
 import { env } from "../config/env";
 
 export const matchesRouter = Router();
@@ -14,19 +14,6 @@ matchesRouter.get("/", async (_req, res, next) => {
     res.json({ matches });
   } catch (error) {
     console.error("[matches] Failed to list matches", error);
-    next(error);
-  }
-});
-
-matchesRouter.get("/this-week-ids", async (_req, res, next) => {
-  try {
-    const teamId = Number.parseInt(env.CHPP_TEAM_ID, 10);
-    console.log(`[matches] GET /api/matches/this-week-ids`);
-    const matchIds = await getThisWeekOfficialMatchesIds(teamId);
-    console.log(`[matches] This week official match IDs: ${matchIds.join(", ")}`);
-    res.json({ matchIds });
-  } catch (error) {
-    console.error("[matches] Failed to get this week match IDs", error);
     next(error);
   }
 });
