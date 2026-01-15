@@ -32,14 +32,6 @@ export type PlayerAvatarProps = {
 function AvatarLayers({ avatar }: { avatar: AvatarData }) {
   return (
     <>
-      {/* Background image - card frame, let it be natural size */}
-      {avatar.backgroundImage && (
-        <img
-          src={normalizeAvatarUrl(avatar.backgroundImage)}
-          alt=""
-          className="absolute left-0 top-0"
-        />
-      )}
       {/* Layer images */}
       {avatar.layers.map((layer, index) => (
         <img
@@ -48,8 +40,8 @@ function AvatarLayers({ avatar }: { avatar: AvatarData }) {
           alt=""
           className="absolute"
           style={{
-            left: layer.x,
-            top: layer.y
+            left: layer.x - 9,
+            top: layer.y - 10
           }}
         />
       ))}
@@ -60,8 +52,12 @@ function AvatarLayers({ avatar }: { avatar: AvatarData }) {
 function FallbackAvatar() {
   return (
     <div
-      className="flex items-center justify-center bg-sky-100 rounded shadow-md"
-      style={{ width: WIDTH, height: HEIGHT }}
+      className="flex items-center justify-center bg-sky-100 rounded"
+      style={{ 
+        width: WIDTH, 
+        height: HEIGHT,
+        boxShadow: "0 6px 16px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3)"
+      }}
     >
       <div className="w-1/2 aspect-square rounded-full bg-sky-500 flex items-center justify-center">
         <Circle className="size-8 text-white" />
@@ -79,8 +75,12 @@ export function PlayerAvatar({ avatar }: PlayerAvatarProps) {
 
   return (
     <div
-      className="relative rounded overflow-hidden shadow-md"
-      style={{ width: WIDTH, height: HEIGHT }}
+      className="relative rounded overflow-hidden"
+      style={{ 
+        width: WIDTH, 
+        height: HEIGHT,
+        boxShadow: "0 6px 16px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3)"
+      }}
     >
       <AvatarLayers avatar={avatar} />
     </div>

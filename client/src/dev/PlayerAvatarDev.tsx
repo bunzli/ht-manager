@@ -65,7 +65,7 @@ export function PlayerAvatarDev() {
 
         <div className="flex flex-col md:flex-row gap-6">
           {/* Preview */}
-          <div>
+          <div className="flex-shrink-0">
             <h3 className="text-sm font-medium text-gray-700 mb-3">
               Preview (92x123)
             </h3>
