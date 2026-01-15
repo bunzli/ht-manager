@@ -9,6 +9,7 @@ export function PlayerAvatar({ playerNumber }: PlayerAvatarProps) {
   return (
     <Box
       sx={{
+        position: "relative",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
