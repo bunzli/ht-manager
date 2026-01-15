@@ -1,4 +1,3 @@
-import { Box, Typography, Chip } from "@mui/material";
 import { getSkillLevelText, formatAge, formatWage, formatTSI } from "./utils";
 
 export type PlayerStatsProps = {
@@ -24,65 +23,33 @@ export function PlayerStats({
   const staminaText = getSkillLevelText(stamina);
 
   return (
-    <Box>
-      <Box sx={{ mb: 1.5 }}>
-        <Typography variant="body2" sx={{ color: "#374151", fontSize: "0.875rem" }}>
-          Age {formatAge(age, ageDays)}
-        </Typography>
-      </Box>
-      <Box sx={{ mb: 1.5 }}>
-        <Typography variant="body2" sx={{ color: "#374151", fontSize: "0.875rem" }}>
-          TSI {formatTSI(tsi)}
-        </Typography>
-      </Box>
-      <Box sx={{ mb: 1.5 }}>
-        <Typography variant="body2" sx={{ color: "#374151", fontSize: "0.875rem" }}>
-          Wage {formatWage(salary)}
-        </Typography>
-      </Box>
-      <Box sx={{ mb: 1.5 }}>
-        <Typography variant="body2" sx={{ color: "#374151", fontSize: "0.875rem" }}>
-          Specialty {specialty ?? "—"}
-        </Typography>
-      </Box>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
-        <Typography variant="body2" sx={{ color: "#374151", fontSize: "0.875rem" }}>
-          Form
-        </Typography>
-        <Chip
-          label={formText}
-          size="small"
-          sx={{
-            bgcolor: "#fef3c7",
-            color: "#92400e",
-            fontWeight: 500,
-            height: 20,
-            fontSize: "0.75rem"
-          }}
-        />
-        <Typography variant="body2" sx={{ color: "#6b7280", fontSize: "0.75rem" }}>
-          {form ?? "—"}
-        </Typography>
-      </Box>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        <Typography variant="body2" sx={{ color: "#374151", fontSize: "0.875rem" }}>
-          Stamina
-        </Typography>
-        <Chip
-          label={staminaText}
-          size="small"
-          sx={{
-            bgcolor: "#fef3c7",
-            color: "#92400e",
-            fontWeight: 500,
-            height: 20,
-            fontSize: "0.75rem"
-          }}
-        />
-        <Typography variant="body2" sx={{ color: "#6b7280", fontSize: "0.75rem" }}>
-          {stamina ?? "—"}
-        </Typography>
-      </Box>
-    </Box>
+    <div className="space-y-1.5">
+      <p className="text-sm text-gray-700">
+        Age {formatAge(age, ageDays)}
+      </p>
+      <p className="text-sm text-gray-700">
+        TSI {formatTSI(tsi)}
+      </p>
+      <p className="text-sm text-gray-700">
+        Wage {formatWage(salary)}
+      </p>
+      <p className="text-sm text-gray-700">
+        Specialty {specialty ?? "—"}
+      </p>
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-gray-700">Form</span>
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800">
+          {formText}
+        </span>
+        <span className="text-xs text-gray-500">{form ?? "—"}</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-gray-700">Stamina</span>
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800">
+          {staminaText}
+        </span>
+        <span className="text-xs text-gray-500">{stamina ?? "—"}</span>
+      </div>
+    </div>
   );
 }

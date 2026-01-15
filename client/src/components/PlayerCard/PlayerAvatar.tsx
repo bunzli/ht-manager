@@ -1,5 +1,4 @@
-import { Box, Avatar } from "@mui/material";
-import { SportsSoccer } from "@mui/icons-material";
+import { Circle } from "lucide-react";
 import type { Avatar as AvatarData } from "../../api/players";
 
 // Avatar display dimensions
@@ -35,26 +34,20 @@ function AvatarLayers({ avatar }: { avatar: AvatarData }) {
     <>
       {/* Background image - card frame, let it be natural size */}
       {avatar.backgroundImage && (
-        <Box
-          component="img"
+        <img
           src={normalizeAvatarUrl(avatar.backgroundImage)}
           alt=""
-          sx={{
-            position: "absolute",
-            left: 0,
-            top: 0
-          }}
+          className="absolute left-0 top-0"
         />
       )}
       {/* Layer images */}
       {avatar.layers.map((layer, index) => (
-        <Box
+        <img
           key={`${layer.image}-${index}`}
-          component="img"
           src={normalizeAvatarUrl(layer.image)}
           alt=""
-          sx={{
-            position: "absolute",
+          className="absolute"
+          style={{
             left: layer.x,
             top: layer.y
           }}
@@ -66,29 +59,14 @@ function AvatarLayers({ avatar }: { avatar: AvatarData }) {
 
 function FallbackAvatar() {
   return (
-    <Box
-      sx={{
-        width: WIDTH,
-        height: HEIGHT,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        bgcolor: "#e0f2fe",
-        borderRadius: 1,
-        boxShadow: "0 0 6px grey"
-      }}
+    <div
+      className="flex items-center justify-center bg-sky-100 rounded shadow-md"
+      style={{ width: WIDTH, height: HEIGHT }}
     >
-      <Avatar
-        sx={{
-          width: "50%",
-          height: "auto",
-          aspectRatio: "1",
-          bgcolor: "#0ea5e9"
-        }}
-      >
-        <SportsSoccer sx={{ fontSize: "2rem", color: "#ffffff" }} />
-      </Avatar>
-    </Box>
+      <div className="w-1/2 aspect-square rounded-full bg-sky-500 flex items-center justify-center">
+        <Circle className="size-8 text-white" />
+      </div>
+    </div>
   );
 }
 
@@ -100,17 +78,11 @@ export function PlayerAvatar({ avatar }: PlayerAvatarProps) {
   }
 
   return (
-    <Box
-      sx={{
-        position: "relative",
-        width: WIDTH,
-        height: HEIGHT,
-        borderRadius: 1,
-        overflow: "hidden",
-        boxShadow: "0 0 6px grey"
-      }}
+    <div
+      className="relative rounded overflow-hidden shadow-md"
+      style={{ width: WIDTH, height: HEIGHT }}
     >
       <AvatarLayers avatar={avatar} />
-    </Box>
+    </div>
   );
 }

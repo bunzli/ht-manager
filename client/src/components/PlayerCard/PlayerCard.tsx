@@ -1,5 +1,4 @@
-import { Box, Paper, Divider, Typography, Chip } from "@mui/material";
-import { Star } from "@mui/icons-material";
+import { Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { PlayerSummary, Avatar } from "../../api/players";
 import { PlayerHeader } from "./PlayerHeader";
@@ -7,6 +6,7 @@ import { PlayerAvatar } from "./PlayerAvatar";
 import { PlayerStats } from "./PlayerStats";
 import { PlayerSkills } from "./PlayerSkills";
 import { computePositionScores, POSITION_ORDER, getPositionAbbreviation, getPositionColor } from "../../features/players/utils/positionScores";
+import { cn } from "@/lib/utils";
 
 export type PlayerCardProps = {
   player: PlayerSummary;
@@ -105,21 +105,12 @@ export function PlayerCard({ player, clickable = false }: PlayerCardProps) {
   };
 
   return (
-    <Paper
-      elevation={2}
+    <div
       onClick={handleClick}
-      sx={{
-        p: 3,
-        bgcolor: "#ffffff",
-        borderRadius: 2,
-        border: "1px solid #e5e7eb",
-        cursor: clickable ? "pointer" : "default",
-        transition: "all 0.2s ease",
-        "&:hover": {
-          boxShadow: clickable ? 6 : 4,
-          transform: clickable ? "translateY(-2px)" : "none"
-        }
-      }}
+      className={cn(
+        "p-4 bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200",
+        clickable && "cursor-pointer hover:shadow-lg hover:-translate-y-0.5"
+      )}
     >
       <PlayerHeader
         name={player.name}
@@ -129,9 +120,9 @@ export function PlayerCard({ player, clickable = false }: PlayerCardProps) {
         countryId={countryId}
       />
       
-      <Box sx={{ display: "flex", gap: 3, mb: 2 }}>
+      <div className="flex gap-4 mb-4">
         <PlayerAvatar avatar={avatar} />
-        <Box sx={{ flex: 1 }}>
+        <div className="flex-1">
           <PlayerStats
             age={age}
             ageDays={ageDays}
@@ -141,8 +132,8 @@ export function PlayerCard({ player, clickable = false }: PlayerCardProps) {
             form={form}
             stamina={stamina}
           />
-        </Box>
-      </Box>
+        </div>
+      </div>
 
       <PlayerSkills
         keeper={keeper}
@@ -156,12 +147,12 @@ export function PlayerCard({ player, clickable = false }: PlayerCardProps) {
 
       {positionScoresResult && (
         <>
-          <Divider sx={{ my: 2 }} />
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="body2" sx={{ color: "#374151", fontSize: "0.875rem", mb: 1, fontWeight: 500 }}>
+          <hr className="my-4 border-gray-200" />
+          <div className="mb-4">
+            <p className="text-sm font-medium text-gray-700 mb-2">
               Position Ratings
-            </Typography>
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+            </p>
+            <div className="flex flex-wrap gap-1">
               {POSITION_ORDER.map((position) => {
                 const score = positionScoresResult.scores[position];
                 if (score === undefined) return null;
@@ -171,62 +162,42 @@ export function PlayerCard({ player, clickable = false }: PlayerCardProps) {
                 const positionAbbrev = getPositionAbbreviation(position);
                 
                 return (
-                  <Chip
+                  <span
                     key={position}
-                    label={`${positionAbbrev}: ${score.toFixed(2)}`}
-                    size="small"
-                    sx={{
-                      bgcolor: isBest ? positionColor : "#f3f4f6",
-                      color: isBest ? "#ffffff" : "#374151",
-                      fontWeight: isBest ? 600 : 400,
-                      fontSize: "0.75rem",
-                      height: "24px",
-                      border: isBest ? `2px solid ${positionColor}` : "1px solid #e5e7eb",
-                      "& .MuiChip-label": {
-                        px: 1
-                      }
-                    }}
-                  />
+                    className={cn(
+                      "inline-flex items-center px-2 py-0.5 rounded text-xs h-6",
+                      isBest ? "font-semibold text-white" : "font-normal text-gray-700 bg-gray-100 border border-gray-200"
+                    )}
+                    style={isBest ? { backgroundColor: positionColor, borderColor: positionColor, borderWidth: 2 } : undefined}
+                  >
+                    {positionAbbrev}: {score.toFixed(2)}
+                  </span>
                 );
               })}
-            </Box>
-          </Box>
+            </div>
+          </div>
         </>
       )}
 
-      <Divider sx={{ my: 2 }} />
+      <hr className="my-4 border-gray-200" />
 
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        <Typography variant="body2" sx={{ color: "#374151", fontSize: "0.875rem" }}>
-          Last rating
-        </Typography>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-          <Star sx={{ fontSize: 16, color: "#fbbf24" }} />
-          <Typography variant="body2" sx={{ color: "#6b7280", fontSize: "0.875rem" }}>
-            {lastRating ?? "—"}
-          </Typography>
-        </Box>
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-gray-700">Last rating</span>
+        <div className="flex items-center gap-1">
+          <Star className="size-4 text-amber-400 fill-amber-400" />
+          <span className="text-sm text-gray-500">{lastRating ?? "—"}</span>
+        </div>
         {formattedDate && (
           <>
-            <Typography
-              variant="body2"
-              sx={{
-                color: "#059669",
-                textDecoration: "underline",
-                fontSize: "0.875rem",
-                ml: 1
-              }}
-            >
+            <span className="text-sm text-emerald-600 underline ml-2">
               {formattedDate}
-            </Typography>
+            </span>
             {lastRatingPosition && (
-              <Typography variant="body2" sx={{ color: "#6b7280", fontSize: "0.875rem" }}>
-                ({lastRatingPosition})
-              </Typography>
+              <span className="text-sm text-gray-500">({lastRatingPosition})</span>
             )}
           </>
         )}
-      </Box>
-    </Paper>
+      </div>
+    </div>
   );
 }

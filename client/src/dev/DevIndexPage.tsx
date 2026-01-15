@@ -1,5 +1,4 @@
-import { Box, Container, Typography, Link, Paper, Grid, Card, CardContent, CardActionArea } from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { DevLayout } from "./DevLayout";
 
 interface DevComponent {
@@ -29,56 +28,37 @@ const DEV_COMPONENTS: DevComponent[] = [
 export function DevIndexPage() {
   return (
     <DevLayout>
-      <Container maxWidth="lg">
-        <Paper sx={{ p: 4 }}>
-          <Typography variant="h4" sx={{ mb: 1, fontWeight: 700, color: "#111827" }}>
-            Dev Components
-          </Typography>
-          <Typography variant="body1" sx={{ mb: 4, color: "#6b7280" }}>
-            Browse and test all available development components. These pages are only available in development mode.
-          </Typography>
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          Dev Components
+        </h2>
+        <p className="text-gray-500 mb-6">
+          Browse and test all available development components. These pages are only available in development mode.
+        </p>
 
-          <Grid container spacing={3}>
-            {DEV_COMPONENTS.map((component) => (
-              <Grid item xs={12} sm={6} md={4} key={component.path}>
-                <Card
-                  sx={{
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    transition: "transform 0.2s, box-shadow 0.2s",
-                    "&:hover": {
-                      transform: "translateY(-4px)",
-                      boxShadow: 4
-                    }
-                  }}
-                >
-                  <CardActionArea
-                    component={RouterLink}
-                    to={component.path}
-                    sx={{ flexGrow: 1, display: "flex", flexDirection: "column", alignItems: "flex-start" }}
-                  >
-                    <CardContent sx={{ flexGrow: 1, width: "100%" }}>
-                      <Typography variant="h6" sx={{ mb: 1, fontWeight: 600, color: "#111827" }}>
-                        {component.name}
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: "#6b7280" }}>
-                        {component.description}
-                      </Typography>
-                    </CardContent>
-                  </CardActionArea>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-
-          <Box sx={{ mt: 4, pt: 3, borderTop: "1px solid #e5e7eb" }}>
-            <Link component={RouterLink} to="/" sx={{ color: "#2563eb", textDecoration: "none" }}>
-              ← Back to App
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {DEV_COMPONENTS.map((component) => (
+            <Link
+              key={component.path}
+              to={component.path}
+              className="block p-4 border border-gray-200 rounded-lg transition-all hover:-translate-y-1 hover:shadow-lg"
+            >
+              <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                {component.name}
+              </h3>
+              <p className="text-sm text-gray-500">
+                {component.description}
+              </p>
             </Link>
-          </Box>
-        </Paper>
-      </Container>
+          ))}
+        </div>
+
+        <div className="mt-6 pt-4 border-t border-gray-200">
+          <Link to="/" className="text-blue-600 hover:underline">
+            ← Back to App
+          </Link>
+        </div>
+      </div>
     </DevLayout>
   );
 }

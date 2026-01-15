@@ -1,4 +1,3 @@
-import { Box, Typography } from "@mui/material";
 import { SkillBar } from "./SkillBar";
 
 export type PlayerSkillsProps = {
@@ -21,19 +20,11 @@ export function PlayerSkills({
   setPieces
 }: PlayerSkillsProps) {
   return (
-    <Box sx={{ mt: 2 }}>
-      <Typography
-        variant="subtitle2"
-        sx={{
-          fontWeight: 600,
-          color: "#374151",
-          mb: 1,
-          fontSize: "0.875rem"
-        }}
-      >
+    <div className="mt-4">
+      <h4 className="font-semibold text-sm text-gray-700 mb-2">
         Skills
-      </Typography>
-      <Box>
+      </h4>
+      <div>
         <SkillBar skillName="Keeper" level={keeper} />
         <SkillBar skillName="Defending" level={defending} />
         <SkillBar skillName="Playmaking" level={playmaking} />
@@ -41,7 +32,7 @@ export function PlayerSkills({
         <SkillBar skillName="Passing" level={passing} />
         <SkillBar skillName="Scoring" level={scoring} />
         <SkillBar skillName="Set Pieces" level={setPieces} />
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }

@@ -1,22 +1,9 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import {
-  Box,
-  Paper,
-  Typography,
-  Stack,
-  Alert,
-  CircularProgress,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Tabs,
-  Tab,
-  Chip
-} from "@mui/material";
+import { AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import { cn } from "@/lib/utils";
 import { fetchTableNames, fetchTableData } from "../../api/db-browser";
 
 function formatValue(value: unknown): string {
@@ -24,7 +11,6 @@ function formatValue(value: unknown): string {
     return "—";
   }
   if (typeof value === "string") {
-    // If it's a JSON string, try to format it nicely
     if (value.startsWith("{") || value.startsWith("[")) {
       try {
         const parsed = JSON.parse(value);
@@ -66,7 +52,6 @@ export function DatabaseBrowserPage() {
     enabled: selectedTable !== null
   });
 
-  // Auto-select first table when tables load
   useEffect(() => {
     if (tableNames.length > 0 && selectedTable === null) {
       setSelectedTable(tableNames[0]);
@@ -74,138 +59,90 @@ export function DatabaseBrowserPage() {
   }, [tableNames, selectedTable]);
 
   return (
-    <Stack spacing={3} sx={{ p: 3 }}>
-      <Typography
-        variant="h5"
-        sx={{
-          color: "#e2e8f0",
-          fontWeight: 700,
-          letterSpacing: "0.5px"
-        }}
-      >
+    <div className="space-y-6 p-4">
+      <h1 className="text-xl font-bold tracking-wide text-foreground">
         Database Browser
-      </Typography>
+      </h1>
 
       {isErrorTables ? (
-        <Alert severity="error">
+        <div className="p-4 bg-error/10 border border-error/30 rounded-lg flex items-center gap-2 text-error">
+          <AlertCircle className="size-5" />
           Failed to load table names
-        </Alert>
+        </div>
       ) : isLoadingTables ? (
-        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-          <CircularProgress />
-        </Box>
+        <div className="flex justify-center py-8">
+          <Spinner size="lg" />
+        </div>
       ) : (
         <>
           {/* Table selector tabs */}
-          <Paper
-            sx={{
-              bgcolor: "#0a0e27",
-              backgroundImage: "linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)",
-              border: "1px solid rgba(66, 153, 225, 0.2)",
-              borderRadius: 2
-            }}
-          >
-            <Tabs
-              value={selectedTable ?? false}
-              onChange={(_e, newValue) => setSelectedTable(newValue)}
-              variant="scrollable"
-              scrollButtons="auto"
-              sx={{
-                borderBottom: "1px solid rgba(66, 153, 225, 0.2)",
-                "& .MuiTab-root": {
-                  color: "#9ca3af",
-                  "&.Mui-selected": {
-                    color: "#4299e1"
-                  }
-                },
-                "& .MuiTabs-indicator": {
-                  backgroundColor: "#4299e1"
-                }
-              }}
-            >
+          <div className="bg-background bg-background-gradient border border-border rounded-lg p-2">
+            <div className="flex flex-wrap gap-1">
               {tableNames.map((tableName) => (
-                <Tab key={tableName} label={tableName} value={tableName} />
+                <Button
+                  key={tableName}
+                  variant={selectedTable === tableName ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setSelectedTable(tableName)}
+                  className={cn(
+                    selectedTable === tableName
+                      ? "bg-primary/20 text-primary"
+                      : "text-muted hover:text-foreground"
+                  )}
+                >
+                  {tableName}
+                </Button>
               ))}
-            </Tabs>
-          </Paper>
+            </div>
+          </div>
 
           {/* Table data */}
           {selectedTable && (
-            <Paper
-              sx={{
-                bgcolor: "#0a0e27",
-                backgroundImage: "linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)",
-                border: "1px solid rgba(66, 153, 225, 0.2)",
-                borderRadius: 2,
-                overflow: "hidden"
-              }}
-            >
-              <Box sx={{ p: 3, borderBottom: "1px solid rgba(66, 153, 225, 0.2)" }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      color: "#e2e8f0",
-                      fontWeight: 600
-                    }}
-                  >
-                    {selectedTable}
-                  </Typography>
-                  {tableData && (
-                    <Chip
-                      label={`${tableData.rowCount} rows`}
-                      size="small"
-                      sx={{
-                        bgcolor: "rgba(66, 153, 225, 0.2)",
-                        color: "#4299e1",
-                        fontWeight: 600
-                      }}
-                    />
-                  )}
-                </Box>
-              </Box>
+            <div className="bg-background bg-background-gradient border border-border rounded-lg overflow-hidden">
+              <div className="p-4 border-b border-border flex items-center gap-4">
+                <h2 className="text-lg font-semibold text-foreground">
+                  {selectedTable}
+                </h2>
+                {tableData && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-primary/20 text-primary">
+                    {tableData.rowCount} rows
+                  </span>
+                )}
+              </div>
 
               {isErrorData ? (
-                <Alert severity="error" sx={{ m: 3 }}>
+                <div className="m-4 p-4 bg-error/10 border border-error/30 rounded-lg flex items-center gap-2 text-error">
+                  <AlertCircle className="size-5" />
                   Failed to load table data
-                </Alert>
+                </div>
               ) : isLoadingData ? (
-                <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-                  <CircularProgress />
-                </Box>
+                <div className="flex justify-center py-8">
+                  <Spinner />
+                </div>
               ) : tableData && tableData.rows.length === 0 ? (
-                <Box sx={{ p: 4, textAlign: "center", color: "#9ca3af" }}>
+                <div className="p-8 text-center text-muted">
                   No data in this table
-                </Box>
+                </div>
               ) : tableData ? (
-                <TableContainer sx={{ maxHeight: "70vh" }}>
-                  <Table stickyHeader>
-                    <TableHead>
-                      <TableRow>
+                <div className="overflow-auto max-h-[70vh]">
+                  <table className="w-full">
+                    <thead className="sticky top-0 bg-background">
+                      <tr>
                         {tableData.columns.map((column) => (
-                          <TableCell
+                          <th
                             key={column}
-                            sx={{
-                              color: "#9ca3af",
-                              borderColor: "rgba(66, 153, 225, 0.2)",
-                              fontWeight: 600,
-                              bgcolor: "#0a0e27"
-                            }}
+                            className="text-left p-4 text-muted font-semibold border-b border-border"
                           >
                             {column}
-                          </TableCell>
+                          </th>
                         ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
+                      </tr>
+                    </thead>
+                    <tbody>
                       {tableData.rows.map((row, idx) => (
-                        <TableRow
+                        <tr
                           key={idx}
-                          sx={{
-                            "&:hover": {
-                              bgcolor: "rgba(66, 153, 225, 0.05)"
-                            }
-                          }}
+                          className="border-b border-border hover:bg-primary/5 transition-colors"
                         >
                           {tableData.columns.map((column) => {
                             const value = row[column];
@@ -213,34 +150,28 @@ export function DatabaseBrowserPage() {
                             const isJson = typeof value === "string" && (value.startsWith("{") || value.startsWith("["));
 
                             return (
-                              <TableCell
+                              <td
                                 key={column}
-                                sx={{
-                                  color: "#cbd5e0",
-                                  borderColor: "rgba(66, 153, 225, 0.2)",
-                                  fontFamily: isJson ? "monospace" : "inherit",
-                                  fontSize: isJson ? "0.75rem" : "0.875rem",
-                                  whiteSpace: isJson ? "pre-wrap" : "normal",
-                                  maxWidth: isJson ? "400px" : "200px",
-                                  overflow: isJson ? "auto" : "hidden",
-                                  textOverflow: isJson ? "unset" : "ellipsis"
-                                }}
+                                className={cn(
+                                  "p-4 text-muted",
+                                  isJson ? "font-mono text-xs whitespace-pre-wrap max-w-[400px] overflow-auto" : "text-sm max-w-[200px] overflow-hidden text-ellipsis"
+                                )}
                                 title={isJson ? formatted : undefined}
                               >
                                 {formatted}
-                              </TableCell>
+                              </td>
                             );
                           })}
-                        </TableRow>
+                        </tr>
                       ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                    </tbody>
+                  </table>
+                </div>
               ) : null}
-            </Paper>
+            </div>
           )}
         </>
       )}
-    </Stack>
+    </div>
   );
 }

@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Box, Paper, Typography, TextField, Stack } from "@mui/material";
 import { DevLayout } from "./DevLayout";
 import { SkillBar } from "../components/PlayerCard";
+import { Input } from "@/components/ui/input";
 
 export function SkillBarDev() {
   const [keeperLevel, setKeeperLevel] = useState<number>(5);
@@ -14,73 +14,87 @@ export function SkillBarDev() {
 
   return (
     <DevLayout>
-      <Paper sx={{ p: 3 }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-2">
           Skill Bar Component
-        </Typography>
-        <Typography variant="body2" sx={{ color: "#6b7280", mb: 3 }}>
+        </h2>
+        <p className="text-sm text-gray-500 mb-4">
           This page allows you to test the SkillBar component with different skill levels.
-        </Typography>
-        <Box sx={{ mb: 4 }}>
-          <Stack spacing={2} direction="row" flexWrap="wrap" sx={{ mb: 3 }}>
-            <TextField
-              label="Keeper"
-              type="number"
-              size="small"
-              value={keeperLevel}
-              onChange={(e) => setKeeperLevel(Number(e.target.value))}
-              inputProps={{ min: 1, max: 20 }}
-            />
-            <TextField
-              label="Defending"
-              type="number"
-              size="small"
-              value={defendingLevel}
-              onChange={(e) => setDefendingLevel(Number(e.target.value))}
-              inputProps={{ min: 1, max: 20 }}
-            />
-            <TextField
-              label="Playmaking"
-              type="number"
-              size="small"
-              value={playmakingLevel}
-              onChange={(e) => setPlaymakingLevel(Number(e.target.value))}
-              inputProps={{ min: 1, max: 20 }}
-            />
-            <TextField
-              label="Winger"
-              type="number"
-              size="small"
-              value={wingerLevel}
-              onChange={(e) => setWingerLevel(Number(e.target.value))}
-              inputProps={{ min: 1, max: 20 }}
-            />
-            <TextField
-              label="Passing"
-              type="number"
-              size="small"
-              value={passingLevel}
-              onChange={(e) => setPassingLevel(Number(e.target.value))}
-              inputProps={{ min: 1, max: 20 }}
-            />
-            <TextField
-              label="Scoring"
-              type="number"
-              size="small"
-              value={scoringLevel}
-              onChange={(e) => setScoringLevel(Number(e.target.value))}
-              inputProps={{ min: 1, max: 20 }}
-            />
-            <TextField
-              label="Set Pieces"
-              type="number"
-              size="small"
-              value={setPiecesLevel}
-              onChange={(e) => setSetPiecesLevel(Number(e.target.value))}
-              inputProps={{ min: 1, max: 20 }}
-            />
-          </Stack>
-          <Box sx={{ bgcolor: "#ffffff", p: 3, borderRadius: 2, border: "1px solid #e5e7eb" }}>
+        </p>
+        <div className="mb-6">
+          <div className="flex flex-wrap gap-3 mb-4">
+            <div className="w-24">
+              <label className="text-xs text-gray-500">Keeper</label>
+              <Input
+                type="number"
+                min={1}
+                max={20}
+                value={keeperLevel}
+                onChange={(e) => setKeeperLevel(Number(e.target.value))}
+              />
+            </div>
+            <div className="w-24">
+              <label className="text-xs text-gray-500">Defending</label>
+              <Input
+                type="number"
+                min={1}
+                max={20}
+                value={defendingLevel}
+                onChange={(e) => setDefendingLevel(Number(e.target.value))}
+              />
+            </div>
+            <div className="w-24">
+              <label className="text-xs text-gray-500">Playmaking</label>
+              <Input
+                type="number"
+                min={1}
+                max={20}
+                value={playmakingLevel}
+                onChange={(e) => setPlaymakingLevel(Number(e.target.value))}
+              />
+            </div>
+            <div className="w-24">
+              <label className="text-xs text-gray-500">Winger</label>
+              <Input
+                type="number"
+                min={1}
+                max={20}
+                value={wingerLevel}
+                onChange={(e) => setWingerLevel(Number(e.target.value))}
+              />
+            </div>
+            <div className="w-24">
+              <label className="text-xs text-gray-500">Passing</label>
+              <Input
+                type="number"
+                min={1}
+                max={20}
+                value={passingLevel}
+                onChange={(e) => setPassingLevel(Number(e.target.value))}
+              />
+            </div>
+            <div className="w-24">
+              <label className="text-xs text-gray-500">Scoring</label>
+              <Input
+                type="number"
+                min={1}
+                max={20}
+                value={scoringLevel}
+                onChange={(e) => setScoringLevel(Number(e.target.value))}
+              />
+            </div>
+            <div className="w-24">
+              <label className="text-xs text-gray-500">Set Pieces</label>
+              <Input
+                type="number"
+                min={1}
+                max={20}
+                value={setPiecesLevel}
+                onChange={(e) => setSetPiecesLevel(Number(e.target.value))}
+              />
+            </div>
+          </div>
+          <div className="bg-white p-4 rounded-lg border border-gray-200">
             <SkillBar skillName="Keeper" level={keeperLevel} />
             <SkillBar skillName="Defending" level={defendingLevel} />
             <SkillBar skillName="Playmaking" level={playmakingLevel} />
@@ -88,20 +102,20 @@ export function SkillBarDev() {
             <SkillBar skillName="Passing" level={passingLevel} />
             <SkillBar skillName="Scoring" level={scoringLevel} />
             <SkillBar skillName="Set Pieces" level={setPiecesLevel} />
-          </Box>
-        </Box>
-        <Box sx={{ mt: 4 }}>
-          <Typography variant="subtitle2" sx={{ mb: 2 }}>
+          </div>
+        </div>
+        <div className="mt-6">
+          <h3 className="text-sm font-medium text-gray-700 mb-3">
             Edge Cases
-          </Typography>
-          <Box sx={{ bgcolor: "#ffffff", p: 3, borderRadius: 2, border: "1px solid #e5e7eb" }}>
+          </h3>
+          <div className="bg-white p-4 rounded-lg border border-gray-200">
             <SkillBar skillName="Null Value" level={null} />
             <SkillBar skillName="Undefined Value" level={undefined} />
             <SkillBar skillName="Low Level" level={1} />
             <SkillBar skillName="High Level" level={20} />
-          </Box>
-        </Box>
-      </Paper>
+          </div>
+        </div>
+      </div>
     </DevLayout>
   );
 }

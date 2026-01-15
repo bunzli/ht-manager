@@ -1,24 +1,10 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import {
-  Box,
-  Paper,
-  Typography,
-  Stack,
-  Alert,
-  CircularProgress,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Chip,
-  IconButton,
-  Divider
-} from "@mui/material";
-import { ArrowBack, SportsSoccer } from "@mui/icons-material";
+import { ArrowLeft, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import { cn } from "@/lib/utils";
 import { fetchPlayer } from "../../api/players";
 import { fetchMatches } from "../../api/matches";
 import { PlayerCard } from "../../components/PlayerCard";
@@ -176,284 +162,194 @@ export function PlayerDetailPage() {
 
   if (!numericPlayerId || Number.isNaN(numericPlayerId)) {
     return (
-      <Alert severity="error" sx={{ m: 3 }}>
+      <div className="m-4 p-4 bg-error/10 border border-error/30 rounded-lg flex items-center gap-2 text-error">
+        <AlertCircle className="size-5" />
         Invalid player ID
-      </Alert>
+      </div>
     );
   }
 
   if (isLoadingPlayer) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
-        <CircularProgress />
-      </Box>
+      <div className="flex justify-center py-16">
+        <Spinner size="lg" />
+      </div>
     );
   }
 
   if (isErrorPlayer || !player) {
     return (
-      <Alert severity="error" sx={{ m: 3 }}>
+      <div className="m-4 p-4 bg-error/10 border border-error/30 rounded-lg flex items-center gap-2 text-error">
+        <AlertCircle className="size-5" />
         Failed to load player data
-      </Alert>
+      </div>
     );
   }
 
   return (
-    <Stack spacing={3} sx={{ p: 3 }}>
+    <div className="space-y-6 p-4">
       {/* Header with back button */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-        <IconButton
+      <div className="flex items-center gap-4">
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={() => navigate(-1)}
-          sx={{
-            color: "#4299e1",
-            "&:hover": {
-              bgcolor: "rgba(66, 153, 225, 0.1)"
-            }
-          }}
+          className="text-primary hover:bg-primary/10"
         >
-          <ArrowBack />
-        </IconButton>
-        <Typography
-          variant="h4"
-          sx={{
-            color: "#e2e8f0",
-            fontWeight: 700,
-            letterSpacing: "0.5px"
-          }}
-        >
+          <ArrowLeft className="size-5" />
+        </Button>
+        <h1 className="text-2xl font-bold tracking-wide text-foreground">
           Player Details
-        </Typography>
-      </Box>
+        </h1>
+      </div>
 
       {/* Player Card */}
-      <Box
-        sx={{
-          bgcolor: "#0a0e27",
-          backgroundImage: "linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)",
-          border: "1px solid rgba(66, 153, 225, 0.2)",
-          borderRadius: 2,
-          p: 3
-        }}
-      >
+      <div className="bg-background bg-background-gradient border border-border rounded-lg p-4">
         <PlayerCard player={player} clickable={false} />
-      </Box>
+      </div>
 
       {/* Changes Table */}
-      <Paper
-        sx={{
-          bgcolor: "#0a0e27",
-          backgroundImage: "linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)",
-          border: "1px solid rgba(66, 153, 225, 0.2)",
-          borderRadius: 2,
-          overflow: "hidden"
-        }}
-      >
-        <Box sx={{ p: 3, borderBottom: "1px solid rgba(66, 153, 225, 0.2)" }}>
-          <Typography
-            variant="h6"
-            sx={{
-              color: "#e2e8f0",
-              fontWeight: 600
-            }}
-          >
+      <div className="bg-background bg-background-gradient border border-border rounded-lg overflow-hidden">
+        <div className="p-4 border-b border-border">
+          <h2 className="text-lg font-semibold text-foreground">
             Property Changes ({player.changes.length})
-          </Typography>
-        </Box>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ color: "#9ca3af", borderColor: "rgba(66, 153, 225, 0.2)" }}>
-                  Date
-                </TableCell>
-                <TableCell sx={{ color: "#9ca3af", borderColor: "rgba(66, 153, 225, 0.2)" }}>
-                  Property
-                </TableCell>
-                <TableCell sx={{ color: "#9ca3af", borderColor: "rgba(66, 153, 225, 0.2)" }}>
-                  Old Value
-                </TableCell>
-                <TableCell sx={{ color: "#9ca3af", borderColor: "rgba(66, 153, 225, 0.2)" }}>
-                  New Value
-                </TableCell>
-                <TableCell sx={{ color: "#9ca3af", borderColor: "rgba(66, 153, 225, 0.2)" }}>
-                  Change
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
+          </h2>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-border">
+                <th className="text-left p-4 text-muted font-medium">Date</th>
+                <th className="text-left p-4 text-muted font-medium">Property</th>
+                <th className="text-left p-4 text-muted font-medium">Old Value</th>
+                <th className="text-left p-4 text-muted font-medium">New Value</th>
+                <th className="text-left p-4 text-muted font-medium">Change</th>
+              </tr>
+            </thead>
+            <tbody>
               {player.changes.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} sx={{ textAlign: "center", color: "#9ca3af", py: 4, borderColor: "rgba(66, 153, 225, 0.2)" }}>
+                <tr>
+                  <td colSpan={5} className="text-center text-muted py-8">
                     No changes recorded
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ) : (
                 player.changes.map((change) => {
                   const oldVal = formatChangeValue(change.fieldName, change.oldValue);
                   const newVal = formatChangeValue(change.fieldName, change.newValue);
                   
-                  // Calculate delta if both are numeric
                   const oldNum = Number(change.oldValue);
                   const newNum = Number(change.newValue);
                   const hasNumericDelta = !Number.isNaN(oldNum) && !Number.isNaN(newNum);
                   const delta = hasNumericDelta ? newNum - oldNum : null;
 
                   return (
-                    <TableRow
+                    <tr
                       key={change.changeId}
-                      sx={{
-                        "&:hover": {
-                          bgcolor: "rgba(66, 153, 225, 0.05)"
-                        }
-                      }}
+                      className="border-b border-border hover:bg-primary/5 transition-colors"
                     >
-                      <TableCell sx={{ color: "#cbd5e0", borderColor: "rgba(66, 153, 225, 0.2)" }}>
+                      <td className="p-4 text-muted">
                         {new Date(change.recordedAt).toLocaleString()}
-                      </TableCell>
-                      <TableCell sx={{ color: "#e2e8f0", fontWeight: 500, borderColor: "rgba(66, 153, 225, 0.2)" }}>
+                      </td>
+                      <td className="p-4 text-foreground font-medium">
                         {formatFieldName(change.fieldName)}
-                      </TableCell>
-                      <TableCell sx={{ color: "#9ca3af", borderColor: "rgba(66, 153, 225, 0.2)" }}>
-                        {oldVal}
-                      </TableCell>
-                      <TableCell sx={{ color: "#e2e8f0", borderColor: "rgba(66, 153, 225, 0.2)" }}>
-                        {newVal}
-                      </TableCell>
-                      <TableCell sx={{ borderColor: "rgba(66, 153, 225, 0.2)" }}>
+                      </td>
+                      <td className="p-4 text-muted">{oldVal}</td>
+                      <td className="p-4 text-foreground">{newVal}</td>
+                      <td className="p-4">
                         {delta !== null ? (
-                          <Typography
-                            sx={{
-                              color: delta > 0 ? "#10b981" : delta < 0 ? "#ef4444" : "#9ca3af",
-                              fontWeight: 600
-                            }}
+                          <span
+                            className={cn(
+                              "font-semibold",
+                              delta > 0 && "text-emerald-500",
+                              delta < 0 && "text-red-500",
+                              delta === 0 && "text-muted"
+                            )}
                           >
                             {delta > 0 ? "+" : ""}{formatNumericDelta(delta)}
-                          </Typography>
+                          </span>
                         ) : (
-                          <Typography sx={{ color: "#9ca3af" }}>—</Typography>
+                          <span className="text-muted">—</span>
                         )}
-                      </TableCell>
-                    </TableRow>
+                      </td>
+                    </tr>
                   );
                 })
               )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       {/* Matches List */}
-      <Paper
-        sx={{
-          bgcolor: "#0a0e27",
-          backgroundImage: "linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)",
-          border: "1px solid rgba(66, 153, 225, 0.2)",
-          borderRadius: 2,
-          overflow: "hidden"
-        }}
-      >
-        <Box sx={{ p: 3, borderBottom: "1px solid rgba(66, 153, 225, 0.2)" }}>
-          <Typography
-            variant="h6"
-            sx={{
-              color: "#e2e8f0",
-              fontWeight: 600
-            }}
-          >
+      <div className="bg-background bg-background-gradient border border-border rounded-lg overflow-hidden">
+        <div className="p-4 border-b border-border">
+          <h2 className="text-lg font-semibold text-foreground">
             Matches ({isLoadingMatches ? "..." : playerMatches.length})
-          </Typography>
-        </Box>
+          </h2>
+        </div>
         {isLoadingMatches ? (
-          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-            <CircularProgress />
-          </Box>
+          <div className="flex justify-center py-8">
+            <Spinner />
+          </div>
         ) : playerMatches.length === 0 ? (
-          <Box sx={{ p: 4, textAlign: "center", color: "#9ca3af" }}>
+          <div className="p-8 text-center text-muted">
             No matches found for this player
-          </Box>
+          </div>
         ) : (
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ color: "#9ca3af", borderColor: "rgba(66, 153, 225, 0.2)" }}>
-                    Date
-                  </TableCell>
-                  <TableCell sx={{ color: "#9ca3af", borderColor: "rgba(66, 153, 225, 0.2)" }}>
-                    Type
-                  </TableCell>
-                  <TableCell sx={{ color: "#9ca3af", borderColor: "rgba(66, 153, 225, 0.2)" }}>
-                    Home Team
-                  </TableCell>
-                  <TableCell sx={{ color: "#9ca3af", borderColor: "rgba(66, 153, 225, 0.2)" }}>
-                    Score
-                  </TableCell>
-                  <TableCell sx={{ color: "#9ca3af", borderColor: "rgba(66, 153, 225, 0.2)" }}>
-                    Away Team
-                  </TableCell>
-                  <TableCell sx={{ color: "#9ca3af", borderColor: "rgba(66, 153, 225, 0.2)" }}>
-                    Status
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left p-4 text-muted font-medium">Date</th>
+                  <th className="text-left p-4 text-muted font-medium">Type</th>
+                  <th className="text-left p-4 text-muted font-medium">Home Team</th>
+                  <th className="text-left p-4 text-muted font-medium">Score</th>
+                  <th className="text-left p-4 text-muted font-medium">Away Team</th>
+                  <th className="text-left p-4 text-muted font-medium">Status</th>
+                </tr>
+              </thead>
+              <tbody>
                 {playerMatches.map((match) => (
-                  <TableRow
+                  <tr
                     key={match.id}
-                    sx={{
-                      "&:hover": {
-                        bgcolor: "rgba(66, 153, 225, 0.05)"
-                      }
-                    }}
+                    className="border-b border-border hover:bg-primary/5 transition-colors"
                   >
-                    <TableCell sx={{ color: "#cbd5e0", borderColor: "rgba(66, 153, 225, 0.2)" }}>
+                    <td className="p-4 text-muted">
                       {formatMatchDate(match.matchDate)}
-                    </TableCell>
-                    <TableCell sx={{ borderColor: "rgba(66, 153, 225, 0.2)" }}>
-                      <Chip
-                        label={getMatchTypeLabel(match.matchType)}
-                        size="small"
-                        sx={{
-                          bgcolor: getMatchTypeColor(match.matchType),
-                          color: "#ffffff",
-                          fontWeight: 600,
-                          fontSize: "0.75rem"
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell sx={{ color: "#e2e8f0", borderColor: "rgba(66, 153, 225, 0.2)" }}>
-                      {match.homeTeamName}
-                    </TableCell>
-                    <TableCell sx={{ color: "#4299e1", fontWeight: 600, borderColor: "rgba(66, 153, 225, 0.2)" }}>
+                    </td>
+                    <td className="p-4">
+                      <span
+                        className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold text-white"
+                        style={{ backgroundColor: getMatchTypeColor(match.matchType) }}
+                      >
+                        {getMatchTypeLabel(match.matchType)}
+                      </span>
+                    </td>
+                    <td className="p-4 text-foreground">{match.homeTeamName}</td>
+                    <td className="p-4 text-primary font-semibold">
                       {match.status === "FINISHED" ? `${match.homeGoals} - ${match.awayGoals}` : "—"}
-                    </TableCell>
-                    <TableCell sx={{ color: "#e2e8f0", borderColor: "rgba(66, 153, 225, 0.2)" }}>
-                      {match.awayTeamName}
-                    </TableCell>
-                    <TableCell sx={{ borderColor: "rgba(66, 153, 225, 0.2)" }}>
-                      <Chip
-                        label={match.status}
-                        size="small"
-                        sx={{
-                          bgcolor:
-                            match.status === "FINISHED"
-                              ? "#10b981"
-                              : match.status === "ONGOING"
-                                ? "#f59e0b"
-                                : "#6b7280",
-                          color: "#ffffff",
-                          fontWeight: 500,
-                          fontSize: "0.75rem"
-                        }}
-                      />
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                    <td className="p-4 text-foreground">{match.awayTeamName}</td>
+                    <td className="p-4">
+                      <span
+                        className={cn(
+                          "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium text-white",
+                          match.status === "FINISHED" && "bg-emerald-500",
+                          match.status === "ONGOING" && "bg-amber-500",
+                          match.status !== "FINISHED" && match.status !== "ONGOING" && "bg-gray-500"
+                        )}
+                      >
+                        {match.status}
+                      </span>
+                    </td>
+                  </tr>
                 ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+              </tbody>
+            </table>
+          </div>
         )}
-      </Paper>
-    </Stack>
+      </div>
+    </div>
   );
 }

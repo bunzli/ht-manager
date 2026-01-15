@@ -1,5 +1,4 @@
-import { Box, Typography, Chip } from "@mui/material";
-import { Favorite } from "@mui/icons-material";
+import { Heart } from "lucide-react";
 import { getSkillLevelText } from "./utils";
 
 export type PlayerHeaderProps = {
@@ -22,59 +21,36 @@ export function PlayerHeader({
   const loyaltyText = getSkillLevelText(loyalty);
 
   return (
-    <Box sx={{ mb: 2 }}>
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 600,
-              color: "#059669",
-              textDecoration: "underline",
-              fontSize: "1.125rem"
-            }}
-          >
+    <div className="mb-4">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
+          <h3 className="font-semibold text-lg text-emerald-600 underline">
             {name}
-          </Typography>
-          <Favorite sx={{ fontSize: 16, color: "#ef4444" }} />
-        </Box>
-        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 0.5 }}>
-          {countryId && (
-            <Box
-              sx={{
-                width: 24,
-                height: 16,
-                bgcolor: "#e5e7eb",
-                borderRadius: 0.5,
-                border: "1px solid #d1d5db"
-              }}
-              title={`Country ID: ${countryId}`}
-            />
-          )}
-        </Box>
-      </Box>
-      <Typography
-        variant="body2"
-        sx={{
-          color: "#374151",
-          fontSize: "0.875rem",
-          lineHeight: 1.5
-        }}
-      >
+          </h3>
+          <Heart className="size-4 text-red-500 fill-red-500" />
+        </div>
+        {countryId && (
+          <div
+            className="w-6 h-4 bg-gray-200 rounded-sm border border-gray-300"
+            title={`Country ID: ${countryId}`}
+          />
+        )}
+      </div>
+      <p className="text-sm text-gray-700 leading-relaxed">
         Has{" "}
-        <Box component="span" sx={{ color: "#059669", fontWeight: 500 }}>
+        <span className="text-emerald-600 font-medium">
           {experienceText} ({experience ?? "—"})
-        </Box>{" "}
+        </span>{" "}
         experience and{" "}
-        <Box component="span" sx={{ color: "#059669", fontWeight: 500 }}>
+        <span className="text-emerald-600 font-medium">
           {leadershipText} ({leadership ?? "—"})
-        </Box>{" "}
+        </span>{" "}
         leadership. Has{" "}
-        <Box component="span" sx={{ color: "#059669", fontWeight: 500 }}>
+        <span className="text-emerald-600 font-medium">
           {loyaltyText} ({loyalty ?? "—"})
-        </Box>{" "}
+        </span>{" "}
         loyalty.
-      </Typography>
-    </Box>
+      </p>
+    </div>
   );
 }

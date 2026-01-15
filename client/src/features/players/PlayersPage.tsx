@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Alert, Stack, Typography } from "@mui/material";
+import { AlertCircle, X } from "lucide-react";
 import { fetchPlayers } from "../../api/players";
 import { fetchMatches } from "../../api/matches";
 import { PlayersList } from "./PlayersList";
@@ -45,17 +45,10 @@ export function PlayersPage() {
 
 
   return (
-    <Stack spacing={3}>
-      <Typography
-        variant="h5"
-        sx={{
-          color: "#e2e8f0",
-          fontWeight: 700,
-          letterSpacing: "0.5px"
-        }}
-      >
+    <div className="space-y-6">
+      <h1 className="text-xl font-bold tracking-wide text-foreground">
         Team Players{filteredCount !== null ? ` (${filteredCount})` : ""}
-      </Typography>
+      </h1>
 
       <PlayerFiltersAndSort
         filters={filters}
@@ -65,17 +58,16 @@ export function PlayersPage() {
       />
 
       {isError ? (
-        <Alert
-          severity="error"
-          onClose={() => refetch()}
-          sx={{
-            bgcolor: "rgba(239, 68, 68, 0.1)",
-            border: "1px solid rgba(239, 68, 68, 0.3)",
-            borderRadius: 2
-          }}
-        >
-          Failed to load players. Try again.
-        </Alert>
+        <div className="flex items-center gap-3 p-4 bg-error/10 border border-error/30 rounded-lg text-error">
+          <AlertCircle className="size-5" />
+          <span className="flex-1">Failed to load players. Try again.</span>
+          <button
+            onClick={() => refetch()}
+            className="p-1 hover:bg-error/20 rounded"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
       ) : (
         <PlayersList 
           players={players} 
@@ -86,6 +78,6 @@ export function PlayersPage() {
           onFilteredCountChange={setFilteredCount}
         />
       )}
-    </Stack>
+    </div>
   );
 }

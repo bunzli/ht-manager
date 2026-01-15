@@ -1,40 +1,33 @@
 import { PropsWithChildren } from "react";
-import { Box, Container, Typography, Link } from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 type DevLayoutProps = PropsWithChildren;
 
 export function DevLayout({ children }: DevLayoutProps) {
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        bgcolor: "#f9fafb",
-        py: 4
-      }}
-    >
-      <Container maxWidth="lg">
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h4" sx={{ mb: 2, fontWeight: 700, color: "#111827" }}>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-5xl mx-auto px-4">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
             Developer Mode
-          </Typography>
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <Link component={RouterLink} to="/dev/player-card" sx={{ color: "#2563eb" }}>
+          </h1>
+          <div className="flex gap-4">
+            <Link to="/dev/player-card" className="text-blue-600 hover:underline">
               Player Card
             </Link>
-            <Link component={RouterLink} to="/dev/skill-bar" sx={{ color: "#2563eb" }}>
+            <Link to="/dev/skill-bar" className="text-blue-600 hover:underline">
               Skill Bar
             </Link>
-            <Link component={RouterLink} to="/dev/player-avatar" sx={{ color: "#2563eb" }}>
+            <Link to="/dev/player-avatar" className="text-blue-600 hover:underline">
               Player Avatar
             </Link>
-            <Link component={RouterLink} to="/" sx={{ color: "#6b7280" }}>
+            <Link to="/" className="text-gray-500 hover:underline">
               ← Back to App
             </Link>
-          </Box>
-        </Box>
+          </div>
+        </div>
         {children}
-      </Container>
-    </Box>
+      </div>
+    </div>
   );
 }

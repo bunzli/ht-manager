@@ -1,6 +1,6 @@
 import { useMemo, useEffect } from "react";
-import { Box, Grid, CircularProgress } from "@mui/material";
 import { PlayerCard } from "../../components/PlayerCard";
+import { Spinner } from "@/components/ui/spinner";
 import type { Player } from "../../api/players";
 import { applyFilters, type PlayerFilters } from "./utils/playerFilters";
 import { sortPlayers, type PlayerSort } from "./utils/playerSorting";
@@ -37,32 +37,24 @@ export function PlayersList({
 
   if (isLoading) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
-        <CircularProgress />
-      </Box>
+      <div className="flex justify-center py-16">
+        <Spinner size="lg" />
+      </div>
     );
   }
 
   return (
-    <Grid container spacing={3}>
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {filteredAndSortedPlayers.map((player) => (
-        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={player.playerId}>
+        <div key={player.playerId}>
           <PlayerCard player={player} clickable={true} />
-        </Grid>
+        </div>
       ))}
       {filteredAndSortedPlayers.length === 0 && (
-        <Grid size={12}>
-          <Box
-            sx={{
-              textAlign: "center",
-              py: 8,
-              color: "#9ca3af"
-            }}
-          >
-            No players found matching the filters
-          </Box>
-        </Grid>
+        <div className="col-span-full text-center py-16 text-gray-400">
+          No players found matching the filters
+        </div>
       )}
-    </Grid>
+    </div>
   );
 }

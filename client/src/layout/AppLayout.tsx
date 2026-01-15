@@ -1,7 +1,10 @@
-import { PropsWithChildren } from "react";
-import { AppBar, Box, Button, Container, Toolbar, Typography, CircularProgress, Snackbar } from "@mui/material";
-import { Refresh } from "@mui/icons-material";
+import { PropsWithChildren, useEffect } from "react";
 import { Link as RouterLink, useLocation } from "react-router-dom";
+import { RefreshCw } from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import { cn } from "@/lib/utils";
 import { useSync } from "../features/players/hooks/useSync";
 
 type AppLayoutProps = PropsWithChildren;
@@ -16,102 +19,65 @@ export function AppLayout({ children }: AppLayoutProps) {
   const { sync, isPending, snackbarMessage, clearSnackbar } = useSync();
   const location = useLocation();
 
+  // Show toast when snackbarMessage changes
+  useEffect(() => {
+    if (snackbarMessage) {
+      toast(snackbarMessage);
+      clearSnackbar();
+    }
+  }, [snackbarMessage, clearSnackbar]);
+
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        bgcolor: "#0a0e27",
-        backgroundImage: "linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)"
-      }}
-    >
-      <AppBar>
-        <Toolbar>
-          <Typography
-            variant="h6"
-            sx={{
-              flexGrow: 1,
-              fontWeight: 700,
-              letterSpacing: "0.5px",
-              color: "#e2e8f0"
-            }}
-          >
+    <div className="min-h-screen bg-background bg-background-gradient">
+      {/* Header */}
+      <header className="sticky top-0 z-50 border-b border-border bg-gradient-to-br from-card to-[#1a1f3a] shadow-card">
+        <div className="flex h-16 items-center px-4 md:px-6">
+          <h1 className="flex-1 text-lg font-bold tracking-wide text-foreground">
             Hattrick Manager
-          </Typography>
-          {pages.map((page) => (
-            <Button
-              key={page.path}
-              component={RouterLink}
-              to={page.path}
-              sx={{
-                ml: 1,
-                color: location.pathname === page.path ? "#4299e1" : "#cbd5e0",
-                fontWeight: location.pathname === page.path ? 600 : 500,
-                textTransform: "uppercase",
-                letterSpacing: "1px",
-                fontSize: "0.875rem",
-                "&:hover": {
-                  color: "#4299e1",
-                  background: "rgba(66, 153, 225, 0.1)"
-                }
-              }}
-            >
-              {page.label}
-            </Button>
-          ))}
+          </h1>
+          <nav className="flex items-center gap-1">
+            {pages.map((page) => (
+              <Button
+                key={page.path}
+                variant="ghost"
+                asChild
+                className={cn(
+                  "text-sm font-medium uppercase tracking-wider",
+                  location.pathname === page.path
+                    ? "text-primary font-semibold"
+                    : "text-muted"
+                )}
+              >
+                <RouterLink to={page.path}>{page.label}</RouterLink>
+              </Button>
+            ))}
+          </nav>
           <Button
-            variant="contained"
-            startIcon={isPending ? <CircularProgress size={20} sx={{ color: "#ffffff" }} /> : <Refresh />}
             onClick={sync}
             disabled={isPending}
-            sx={{
-              textTransform: "uppercase",
-              letterSpacing: "1px",
-              fontSize: "0.875rem",
-              ml: 2
-            }}
+            className="ml-4 text-sm uppercase tracking-wider"
           >
+            {isPending ? (
+              <Spinner size="sm" className="text-white" />
+            ) : (
+              <RefreshCw className="size-4" />
+            )}
             Fetch updates
           </Button>
-        </Toolbar>
-      </AppBar>
-      <Toolbar />
-      <Container maxWidth="xl" sx={{ py: 3 }}>
+        </div>
+      </header>
+
+      {/* Main content */}
+      <main className="container mx-auto max-w-7xl px-4 py-6 md:px-6">
         {children}
-      </Container>
-      <Box
-        component="footer"
-        sx={{
-          py: 3,
-          textAlign: "center",
-          bgcolor: "#0f1428",
-          borderTop: "1px solid rgba(66, 153, 225, 0.2)",
-          mt: "auto"
-        }}
-      >
-        <Typography
-          variant="body2"
-          sx={{
-            color: "rgba(203, 213, 224, 0.6)",
-            fontSize: "0.875rem"
-          }}
-        >
-          ⚽️ Hattrick Manager v0.1 — stay sharp, coach!
-        </Typography>
-      </Box>
-      <Snackbar
-        open={snackbarMessage !== null}
-        autoHideDuration={6000}
-        onClose={clearSnackbar}
-        message={snackbarMessage ?? ""}
-        ContentProps={{
-          sx: {
-            bgcolor: "#0f1428",
-            border: "1px solid rgba(66, 153, 225, 0.2)",
-            borderRadius: 2,
-            color: "#cbd5e0"
-          }
-        }}
-      />
-    </Box>
+      </main>
+
+      {/* Footer */}
+      <footer className="mt-auto border-t border-border bg-card py-4 text-center">
+        <p className="text-sm text-muted-foreground">
+          Hattrick Manager v0.1 — stay sharp, coach!
+        </p>
+      </footer>
+    </div>
   );
 }

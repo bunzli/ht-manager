@@ -1,8 +1,7 @@
 import { MouseEvent, KeyboardEvent } from "react";
-import { Box, IconButton, Tooltip } from "@mui/material";
-import TimelapseIcon from "@mui/icons-material/Timelapse";
-import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
-import CircleIcon from "@mui/icons-material/Circle";
+import { Circle, CircleDot, CircleDashed } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 import { TrainingPreference, useTrainingPreferences } from "../state/useTrainingPreferences";
 
 const LABELS: Record<TrainingPreference, string> = {
@@ -17,10 +16,10 @@ const TOOLTIP: Record<TrainingPreference, string> = {
   full: "Click to clear training focus"
 };
 
-const ICONS: Record<TrainingPreference, typeof CircleIcon> = {
-  none: RadioButtonUncheckedIcon,
-  half: TimelapseIcon,
-  full: CircleIcon
+const ICONS: Record<TrainingPreference, typeof Circle> = {
+  none: CircleDashed,
+  half: CircleDot,
+  full: Circle
 };
 
 type TrainingPreferenceToggleProps = {
@@ -51,33 +50,23 @@ export function TrainingPreferenceToggle({ playerId }: TrainingPreferenceToggleP
   };
 
   return (
-    <Box display="flex" alignItems="center">
-      <Tooltip title={TOOLTIP[preference]}>
-        <IconButton
-          size="small"
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
           aria-label={`Training preference: ${LABELS[preference]}`}
           onClick={handleClick}
           onKeyDown={handleKeyDown}
-          sx={{
-            color: (theme) => {
-              if (preference === "full") {
-                return "#4299e1";
-              }
-              if (preference === "half") {
-                return "#63b3ed";
-              }
-              return "rgba(203, 213, 224, 0.4)";
-            },
-            transition: "all 0.2s ease-in-out",
-            "&:hover": {
-              bgcolor: "rgba(66, 153, 225, 0.1)",
-              transform: "scale(1.1)"
-            }
-          }}
+          className={cn(
+            "p-1.5 rounded-md transition-all duration-200 hover:bg-primary/10 hover:scale-110",
+            preference === "full" && "text-primary",
+            preference === "half" && "text-primary-light",
+            preference === "none" && "text-muted/40"
+          )}
         >
-          <IconComponent fontSize="small" />
-        </IconButton>
-      </Tooltip>
-    </Box>
+          <IconComponent className="size-4" />
+        </button>
+      </TooltipTrigger>
+      <TooltipContent>{TOOLTIP[preference]}</TooltipContent>
+    </Tooltip>
   );
 }

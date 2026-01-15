@@ -1,14 +1,17 @@
-import { Box, Stack, IconButton, TextField, Tooltip, Paper, Button } from "@mui/material";
 import {
-  ArrowUpward,
-  ArrowDownward,
-  Remove,
-  Event,
-  Person,
+  ArrowUp,
+  ArrowDown,
+  Minus,
+  CalendarDays,
+  User,
   Cake,
   TrendingUp,
-  SportsSoccer
-} from "@mui/icons-material";
+  Circle
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 import type { PlayerFilters } from "../utils/playerFilters";
 import type { PlayerSort, SortField } from "../utils/playerSorting";
 import { POSITION_ORDER, getPositionAbbreviation, getPositionColor } from "../utils/positionScores";
@@ -20,14 +23,14 @@ export type PlayerFiltersAndSortProps = {
   onSortChange: (sort: PlayerSort) => void;
 };
 
-const SORT_OPTIONS: Array<{ field: SortField; label: string; icon: JSX.Element; startsWithDesc?: boolean }> = [
-  { field: "name", label: "Name", icon: <Person /> },
-  { field: "age", label: "Age", icon: <Cake /> },
-  { field: "tsi", label: "TSI", icon: <TrendingUp />, startsWithDesc: true },
+const SORT_OPTIONS: Array<{ field: SortField; label: string; icon: React.ReactNode; startsWithDesc?: boolean }> = [
+  { field: "name", label: "Name", icon: <User className="size-4" /> },
+  { field: "age", label: "Age", icon: <Cake className="size-4" /> },
+  { field: "tsi", label: "TSI", icon: <TrendingUp className="size-4" />, startsWithDesc: true },
   ...POSITION_ORDER.map((pos) => ({
     field: `positionScore${pos}` as SortField,
     label: getPositionAbbreviation(pos),
-    icon: <SportsSoccer sx={{ color: getPositionColor(pos) }} />,
+    icon: <Circle className="size-4" style={{ color: getPositionColor(pos) }} />,
     startsWithDesc: true
   }))
 ];
@@ -51,9 +54,9 @@ function getNextSortDirection(
 }
 
 function getSortIcon(direction: "asc" | "desc" | null) {
-  if (direction === "asc") return <ArrowUpward />;
-  if (direction === "desc") return <ArrowDownward />;
-  return <Remove />;
+  if (direction === "asc") return <ArrowUp className="size-4" />;
+  if (direction === "desc") return <ArrowDown className="size-4" />;
+  return <Minus className="size-4" />;
 }
 
 export function PlayerFiltersAndSort({
@@ -93,135 +96,98 @@ export function PlayerFiltersAndSort({
     }
   };
 
-  const getPlayedThisWeekIcon = () => {
-    if (filters.playedThisWeek === "yes") {
-      return <Event sx={{ color: "#10b981" }} />;
-    }
-    if (filters.playedThisWeek === "no") {
-      return <Event sx={{ color: "#ef4444", opacity: 0.5 }} />;
-    }
-    return <Event sx={{ color: "#9ca3af" }} />;
-  };
-
-  const commonTextFieldStyles = {
-    "& .MuiOutlinedInput-root": {
-      color: "#cbd5e0",
-      "& fieldset": {
-        borderColor: "rgba(66, 153, 225, 0.3)"
-      },
-      "&:hover fieldset": {
-        borderColor: "rgba(66, 153, 225, 0.5)"
-      },
-      "&.Mui-focused fieldset": {
-        borderColor: "#4299e1"
-      }
-    },
-    "& .MuiInputLabel-root": {
-      color: "#9ca3af"
-    }
+  const getPlayedThisWeekColor = () => {
+    if (filters.playedThisWeek === "yes") return "text-emerald-500";
+    if (filters.playedThisWeek === "no") return "text-red-500 opacity-50";
+    return "text-gray-400";
   };
 
   return (
-    <Paper
-      elevation={2}
-      sx={{
-        p: 2,
-        bgcolor: "rgba(30, 41, 59, 0.5)",
-        border: "1px solid rgba(66, 153, 225, 0.2)",
-        borderRadius: 2
-      }}
-    >
-      <Stack spacing={2}>
-        {/* Sort Section */}
-        <Box>
-          <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
-            {SORT_OPTIONS.map((option) => {
-              const isActive = sort.field === option.field;
-              const sortDirectionIcon = isActive ? getSortIcon(sort.direction) : <Remove sx={{ opacity: 0.3 }} />;
-              const cycleText = option.startsWithDesc
-                ? "desc → asc → none"
-                : "asc → desc → none";
-              
-              return (
-                <Tooltip
-                  key={option.field}
-                  title={`Sort by ${option.label} (click to cycle: ${cycleText})`}
+    <div className="p-4 bg-slate-800/50 border border-border rounded-lg space-y-4">
+      {/* Sort Section */}
+      <div className="flex flex-wrap gap-2 items-center">
+        {SORT_OPTIONS.map((option) => {
+          const isActive = sort.field === option.field;
+          const sortDirectionIcon = isActive 
+            ? getSortIcon(sort.direction) 
+            : <Minus className="size-4 opacity-30" />;
+          const cycleText = option.startsWithDesc
+            ? "desc → asc → none"
+            : "asc → desc → none";
+          
+          return (
+            <Tooltip key={option.field}>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={() => handleSortClick(option.field, option.startsWithDesc)}
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "gap-1",
+                    isActive && sort.direction === "asc" && "text-emerald-500",
+                    isActive && sort.direction === "desc" && "text-red-500",
+                    isActive && sort.direction === null && "text-gray-400",
+                    !isActive && "text-gray-400",
+                    isActive ? "border-border-hover" : "border-border"
+                  )}
                 >
-                  <Button
-                    onClick={() => handleSortClick(option.field, option.startsWithDesc)}
-                    startIcon={
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                        {option.icon}
-                        {sortDirectionIcon}
-                      </Box>
-                    }
-                    size="small"
-                    variant="outlined"
-                    sx={{
-                      color: isActive
-                        ? sort.direction === null
-                          ? "#9ca3af"
-                          : sort.direction === "asc"
-                          ? "#10b981"
-                          : "#ef4444"
-                        : "#9ca3af",
-                      borderColor: isActive ? "rgba(66, 153, 225, 0.5)" : "rgba(66, 153, 225, 0.2)",
-                      "&:hover": {
-                        bgcolor: "rgba(66, 153, 225, 0.1)",
-                        borderColor: "rgba(66, 153, 225, 0.5)"
-                      }
-                    }}
-                  >
-                    {option.label}
-                  </Button>
-                </Tooltip>
-              );
-            })}
-          </Stack>
-        </Box>
-
-        {/* Filter Section */}
-        <Box>
-          <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
-            {/* Played This Week Filter */}
-            <Tooltip title="Filter: Played this week (click to cycle: yes → no → all)">
-              <IconButton
-                onClick={togglePlayedThisWeek}
-                sx={{
-                  border: filters.playedThisWeek !== undefined
-                    ? "1px solid rgba(66, 153, 225, 0.5)"
-                    : "1px solid transparent",
-                  "&:hover": {
-                    bgcolor: "rgba(66, 153, 225, 0.1)"
-                  }
-                }}
-              >
-                {getPlayedThisWeekIcon()}
-              </IconButton>
+                  <span className="flex items-center gap-1">
+                    {option.icon}
+                    {sortDirectionIcon}
+                  </span>
+                  {option.label}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                Sort by {option.label} (click to cycle: {cycleText})
+              </TooltipContent>
             </Tooltip>
+          );
+        })}
+      </div>
 
-            {/* Best Position Score Filter */}
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <TextField
-                size="small"
-                label="Min Position Score"
-                type="number"
-                value={filters.minPositionScore ?? ""}
-                onChange={(e) => updateFilter("minPositionScore", e.target.value === "" ? null : Number(e.target.value))}
-                sx={{ ...commonTextFieldStyles, width: 150 }}
-              />
-              <TextField
-                size="small"
-                label="Max Position Score"
-                type="number"
-                value={filters.maxPositionScore ?? ""}
-                onChange={(e) => updateFilter("maxPositionScore", e.target.value === "" ? null : Number(e.target.value))}
-                sx={{ ...commonTextFieldStyles, width: 150 }}
-              />
-            </Box>
-          </Stack>
-        </Box>
-      </Stack>
-    </Paper>
+      {/* Filter Section */}
+      <div className="flex flex-wrap gap-4 items-center">
+        {/* Played This Week Filter */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={togglePlayedThisWeek}
+              className={cn(
+                "p-2 rounded-md transition-colors hover:bg-primary/10",
+                filters.playedThisWeek !== undefined ? "border border-border-hover" : "border border-transparent"
+              )}
+            >
+              <CalendarDays className={cn("size-5", getPlayedThisWeekColor())} />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>
+            Filter: Played this week (click to cycle: yes → no → all)
+          </TooltipContent>
+        </Tooltip>
+
+        {/* Best Position Score Filter */}
+        <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-muted">Min Position Score</label>
+            <Input
+              type="number"
+              value={filters.minPositionScore ?? ""}
+              onChange={(e) => updateFilter("minPositionScore", e.target.value === "" ? null : Number(e.target.value))}
+              className="w-36"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-muted">Max Position Score</label>
+            <Input
+              type="number"
+              value={filters.maxPositionScore ?? ""}
+              onChange={(e) => updateFilter("maxPositionScore", e.target.value === "" ? null : Number(e.target.value))}
+              className="w-36"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

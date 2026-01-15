@@ -1,4 +1,3 @@
-import { Box, Typography } from "@mui/material";
 import { getSkillLevelText, getSkillLevelColor } from "./utils";
 
 export type SkillBarProps = {
@@ -16,74 +15,28 @@ export function SkillBar({ skillName, level, maxLevel = 20 }: SkillBarProps) {
   const barWidth = maxLevel > 0 ? (levelValue / maxLevel) * 100 : 0;
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        gap: 1,
-        mb: 0.5
-      }}
-    >
-      <Typography
-        variant="body2"
-        sx={{
-          minWidth: 100,
-          fontSize: "0.875rem",
-          color: "#374151"
-        }}
-      >
+    <div className="flex items-center gap-2 mb-1">
+      <span className="min-w-[100px] text-sm text-gray-700">
         {skillName}
-      </Typography>
-      <Box
-        sx={{
-          flex: 1,
-          height: 20,
-          bgcolor: "#e5e7eb",
-          borderRadius: 1,
-          position: "relative",
-          overflow: "hidden"
-        }}
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            left: 0,
-            top: 0,
-            height: "100%",
+      </span>
+      <div className="relative flex-1 h-5 bg-gray-200 rounded overflow-hidden">
+        <div
+          className="absolute left-0 top-0 h-full opacity-30 transition-[width] duration-300 ease-out"
+          style={{
             width: `${barWidth}%`,
-            bgcolor: levelColor,
-            opacity: 0.3,
-            transition: "width 0.3s ease"
+            backgroundColor: levelColor
           }}
         />
-        <Typography
-          variant="body2"
-          sx={{
-            position: "absolute",
-            left: 8,
-            top: "50%",
-            transform: "translateY(-50%)",
-            fontSize: "0.75rem",
-            fontWeight: 500,
-            color: levelColor,
-            zIndex: 1
-          }}
+        <span
+          className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-medium z-10"
+          style={{ color: levelColor }}
         >
           {levelText}
-        </Typography>
-      </Box>
-      <Typography
-        variant="body2"
-        sx={{
-          minWidth: 24,
-          textAlign: "right",
-          fontSize: "0.875rem",
-          color: "#6b7280",
-          fontWeight: 500
-        }}
-      >
+        </span>
+      </div>
+      <span className="min-w-[24px] text-right text-sm font-medium text-gray-500">
         {levelValue}
-      </Typography>
-    </Box>
+      </span>
+    </div>
   );
 }

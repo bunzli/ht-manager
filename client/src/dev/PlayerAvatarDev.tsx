@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Box, Paper, Typography, TextField, Stack, Button, Alert } from "@mui/material";
+import { AlertCircle } from "lucide-react";
 import { DevLayout } from "./DevLayout";
 import { PlayerAvatar } from "../components/PlayerCard";
+import { Button } from "@/components/ui/button";
 import type { Avatar } from "../api/players";
 
 // Sample avatar data based on real Hattrick API response
@@ -52,91 +53,71 @@ export function PlayerAvatarDev() {
 
   return (
     <DevLayout>
-      <Paper sx={{ p: 3, mb: 3 }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>
+      <div className="bg-white rounded-lg shadow p-6 mb-4">
+        <h2 className="text-lg font-semibold text-gray-900 mb-2">
           Player Avatar Component
-        </Typography>
-        <Typography variant="body2" sx={{ color: "#6b7280", mb: 3 }}>
+        </h2>
+        <p className="text-sm text-gray-500 mb-4">
           Test the PlayerAvatar component with real avatar data structure from the Hattrick API.
           The avatar is composed of a background image and multiple layers positioned using x/y coordinates.
           URLs are automatically normalized to use the correct Hattrick image server.
-        </Typography>
+        </p>
 
-        <Stack direction={{ xs: "column", md: "row" }} spacing={4}>
+        <div className="flex flex-col md:flex-row gap-6">
           {/* Preview */}
-          <Box>
-            <Typography variant="subtitle2" sx={{ mb: 2 }}>
+          <div>
+            <h3 className="text-sm font-medium text-gray-700 mb-3">
               Preview (92x123)
-            </Typography>
-            <Stack direction="row" spacing={3} alignItems="flex-start">
-              <Box>
-                <Typography variant="caption" sx={{ display: "block", mb: 1, color: "#6b7280" }}>
-                  With Avatar
-                </Typography>
+            </h3>
+            <div className="flex gap-6">
+              <div>
+                <span className="text-xs text-gray-500 block mb-2">With Avatar</span>
                 <PlayerAvatar avatar={avatar} />
-              </Box>
-              <Box>
-                <Typography variant="caption" sx={{ display: "block", mb: 1, color: "#6b7280" }}>
-                  Fallback (null)
-                </Typography>
+              </div>
+              <div>
+                <span className="text-xs text-gray-500 block mb-2">Fallback (null)</span>
                 <PlayerAvatar avatar={null} />
-              </Box>
-            </Stack>
-          </Box>
+              </div>
+            </div>
+          </div>
 
           {/* JSON Editor */}
-          <Box sx={{ flex: 1 }}>
-            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-              <Typography variant="subtitle2">
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-medium text-gray-700">
                 Avatar Data (JSON)
-              </Typography>
-              <Stack direction="row" spacing={1}>
-                <Button variant="outlined" size="small" onClick={handleReset}>
+              </h3>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={handleReset}>
                   Reset
                 </Button>
-                <Button variant="outlined" size="small" color="warning" onClick={handleClear}>
+                <Button variant="outline" size="sm" onClick={handleClear}>
                   Set Null
                 </Button>
-              </Stack>
-            </Stack>
+              </div>
+            </div>
             
             {parseError && (
-              <Alert severity="error" sx={{ mb: 2 }}>
+              <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-600 text-sm">
+                <AlertCircle className="size-4" />
                 {parseError}
-              </Alert>
+              </div>
             )}
 
-            <TextField
-              multiline
-              fullWidth
-              minRows={16}
-              maxRows={24}
+            <textarea
+              className="w-full h-80 p-3 font-mono text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               value={jsonInput}
               onChange={(e) => handleJsonChange(e.target.value)}
-              error={!!parseError}
-              sx={{
-                fontFamily: "monospace",
-                "& .MuiInputBase-input": {
-                  fontFamily: "monospace",
-                  fontSize: "0.85rem"
-                }
-              }}
             />
-          </Box>
-        </Stack>
+          </div>
+        </div>
 
         {/* Data Structure Reference */}
-        <Box sx={{ mt: 4 }}>
-          <Typography variant="subtitle2" sx={{ mb: 1 }}>
+        <div className="mt-6">
+          <h3 className="text-sm font-medium text-gray-700 mb-2">
             Data Structure Reference
-          </Typography>
-          <Typography variant="body2" component="pre" sx={{ 
-            bgcolor: "#f3f4f6", 
-            p: 2, 
-            borderRadius: 1, 
-            fontSize: "0.8rem",
-            overflow: "auto"
-          }}>
+          </h3>
+          <pre className="bg-gray-100 p-4 rounded-lg text-sm overflow-auto">
 {`type Avatar = {
   backgroundImage: string;  // URL or path like "/Img/Avatar/backgrounds/bg_blue.png"
   layers: AvatarLayer[];
@@ -147,9 +128,9 @@ type AvatarLayer = {
   x: number;      // x-coordinate for positioning
   y: number;      // y-coordinate for positioning
 };`}
-          </Typography>
-        </Box>
-      </Paper>
+          </pre>
+        </div>
+      </div>
     </DevLayout>
   );
 }

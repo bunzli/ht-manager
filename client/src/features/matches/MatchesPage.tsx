@@ -1,15 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import {
-  Alert,
-  Box,
-  Card,
-  CardContent,
-  Chip,
-  Stack,
-  Typography,
-  Grid
-} from "@mui/material";
-import { SportsSoccer, CalendarToday, EmojiEvents } from "@mui/icons-material";
+import { AlertCircle, X, Calendar, Circle } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { fetchMatches } from "../../api/matches";
 
 function getMatchTypeColor(matchType: string): string {
@@ -73,163 +64,90 @@ export function MatchesPage() {
     refetch
   } = useQuery({
     queryKey: ["matches"],
-    queryFn: () => fetchMatches(50) // Get last 50 matches
+    queryFn: () => fetchMatches(50)
   });
 
   return (
-    <Stack spacing={3}>
-      <Typography
-        variant="h5"
-        sx={{
-          color: "#e2e8f0",
-          fontWeight: 700,
-          letterSpacing: "0.5px"
-        }}
-      >
+    <div className="space-y-6">
+      <h1 className="text-xl font-bold tracking-wide text-foreground">
         Matches
-      </Typography>
+      </h1>
 
       {isError ? (
-        <Alert
-          severity="error"
-          onClose={() => refetch()}
-          sx={{
-            bgcolor: "rgba(239, 68, 68, 0.1)",
-            border: "1px solid rgba(239, 68, 68, 0.3)",
-            borderRadius: 2
-          }}
-        >
-          Failed to load matches. Try again.
-        </Alert>
+        <div className="flex items-center gap-3 p-4 bg-error/10 border border-error/30 rounded-lg text-error">
+          <AlertCircle className="size-5" />
+          <span className="flex-1">Failed to load matches. Try again.</span>
+          <button
+            onClick={() => refetch()}
+            className="p-1 hover:bg-error/20 rounded"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
       ) : (
-        <Grid container spacing={2}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {matches.map((match) => (
-            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={match.id}>
-              <Card
-                sx={{
-                  bgcolor: "#0a0e27",
-                  backgroundImage: "linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)",
-                  border: "1px solid rgba(66, 153, 225, 0.2)",
-                  borderRadius: 2,
-                  "&:hover": {
-                    borderColor: "rgba(66, 153, 225, 0.4)",
-                    boxShadow: "0 4px 12px rgba(66, 153, 225, 0.2)"
-                  }
-                }}
-              >
-                <CardContent>
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
-                    <Chip
-                      label={getMatchTypeLabel(match.matchType)}
-                      size="small"
-                      sx={{
-                        bgcolor: getMatchTypeColor(match.matchType),
-                        color: "#ffffff",
-                        fontWeight: 600,
-                        fontSize: "0.75rem"
-                      }}
-                    />
-                    <Chip
-                      label={match.status}
-                      size="small"
-                      sx={{
-                        bgcolor:
-                          match.status === "FINISHED"
-                            ? "#10b981"
-                            : match.status === "ONGOING"
-                              ? "#f59e0b"
-                              : "#6b7280",
-                        color: "#ffffff",
-                        fontWeight: 500,
-                        fontSize: "0.75rem"
-                      }}
-                    />
-                  </Box>
+            <div
+              key={match.id}
+              className="bg-background bg-background-gradient border border-border rounded-lg p-4 transition-all hover:border-border-hover hover:shadow-card"
+            >
+              <div className="flex justify-between items-start mb-4">
+                <span
+                  className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold text-white"
+                  style={{ backgroundColor: getMatchTypeColor(match.matchType) }}
+                >
+                  {getMatchTypeLabel(match.matchType)}
+                </span>
+                <span
+                  className={cn(
+                    "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium text-white",
+                    match.status === "FINISHED" && "bg-emerald-500",
+                    match.status === "ONGOING" && "bg-amber-500",
+                    match.status !== "FINISHED" && match.status !== "ONGOING" && "bg-gray-500"
+                  )}
+                >
+                  {match.status}
+                </span>
+              </div>
 
-                  <Box sx={{ mb: 2 }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-                      <SportsSoccer sx={{ fontSize: 16, color: "#4299e1" }} />
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          color: "#e2e8f0",
-                          fontWeight: 600,
-                          fontSize: "0.875rem"
-                        }}
-                      >
-                        {match.homeTeamName}
-                      </Typography>
-                      {match.status === "FINISHED" && (
-                        <Typography
-                          variant="h6"
-                          sx={{
-                            color: "#4299e1",
-                            fontWeight: 700,
-                            ml: "auto"
-                          }}
-                        >
-                          {match.homeGoals}
-                        </Typography>
-                      )}
-                    </Box>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <SportsSoccer sx={{ fontSize: 16, color: "#4299e1" }} />
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          color: "#e2e8f0",
-                          fontWeight: 600,
-                          fontSize: "0.875rem"
-                        }}
-                      >
-                        {match.awayTeamName}
-                      </Typography>
-                      {match.status === "FINISHED" && (
-                        <Typography
-                          variant="h6"
-                          sx={{
-                            color: "#4299e1",
-                            fontWeight: 700,
-                            ml: "auto"
-                          }}
-                        >
-                          {match.awayGoals}
-                        </Typography>
-                      )}
-                    </Box>
-                  </Box>
+              <div className="space-y-2 mb-4">
+                <div className="flex items-center gap-2">
+                  <Circle className="size-4 text-primary" />
+                  <span className="text-sm font-semibold text-foreground flex-1">
+                    {match.homeTeamName}
+                  </span>
+                  {match.status === "FINISHED" && (
+                    <span className="text-lg font-bold text-primary">
+                      {match.homeGoals}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Circle className="size-4 text-primary" />
+                  <span className="text-sm font-semibold text-foreground flex-1">
+                    {match.awayTeamName}
+                  </span>
+                  {match.status === "FINISHED" && (
+                    <span className="text-lg font-bold text-primary">
+                      {match.awayGoals}
+                    </span>
+                  )}
+                </div>
+              </div>
 
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 2 }}>
-                    <CalendarToday sx={{ fontSize: 14, color: "#9ca3af" }} />
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: "#9ca3af",
-                        fontSize: "0.75rem"
-                      }}
-                    >
-                      {formatMatchDate(match.matchDate)}
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
+              <div className="flex items-center gap-2 text-muted">
+                <Calendar className="size-3.5" />
+                <span className="text-xs">{formatMatchDate(match.matchDate)}</span>
+              </div>
+            </div>
           ))}
           {matches.length === 0 && !isLoading && (
-            <Grid size={12}>
-              <Box
-                sx={{
-                  textAlign: "center",
-                  py: 8,
-                  color: "#9ca3af"
-                }}
-              >
-                No matches found
-              </Box>
-            </Grid>
+            <div className="col-span-full text-center py-16 text-muted">
+              No matches found
+            </div>
           )}
-        </Grid>
+        </div>
       )}
-    </Stack>
+    </div>
   );
 }
